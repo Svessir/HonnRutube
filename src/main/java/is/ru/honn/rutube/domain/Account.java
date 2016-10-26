@@ -69,4 +69,12 @@ public class Account {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    /**
+     * @return Account fields as string.
+     */
+    @Override
+    public String toString() {
+        return "username: " + username + " password: " + password;
+    }
 }

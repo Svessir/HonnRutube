@@ -9,14 +9,17 @@
 
 package is.ru.honn.rutube.conrollers;
 
+import is.ru.honn.rutube.domain.Account;
 import is.ru.honn.rutube.domain.AccountRegistration;
+import is.ru.honn.rutube.domain.Token;
+import is.ru.honn.rutube.services.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * RESTful account controller.
@@ -27,18 +30,83 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AccountController {
 
+    AccountService accountService;
+
+    @Autowired
+    public  AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
     /**
-     * The controller that handles sign up requests to RuTube.
+     * The controller method that handles sign up requests to RuTube.
      *
      * @param accountRegistration The account registration form.
      * @return A response of 200 OK if sign up succeeded else 400 Bad Request.
      */
     @RequestMapping(value = "/account/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity signUp(@RequestBody AccountRegistration accountRegistration) {
-        System.out.println(accountRegistration);
-        if(accountRegistration != null)
+        System.out.println(accountRegistration + " REST");
+        if(accountService.register(accountRegistration))
+            return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * The controller method that handles authentication/login to RuTube.
+     *
+     * @param account The login form.
+     * @return //TODO: decide on proper return
+     */
+    @RequestMapping(value = "/account/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Token> authenticate(@RequestBody Account account) {
+        Token token = accountService.login(account);
+
+        if(token != null)
+            return new ResponseEntity<Token>(token, HttpStatus.OK);
+        else
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * The controller method that handles updating account information.
+     *
+     * @param accountRegistration The updated account information.
+     * @return 200 OK if update succeeded, 401 UNAUTHORIZED if authorization is wanting
+     *         else if update fails then 400 BAD REQUEST .
+     */
+    @RequestMapping(value = "/account/update", method = RequestMethod.PUT)
+    ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
+                          @RequestHeader(name = "Token", required = false) String token) {
+        if(!accountService.isValidAccountToken(Token.parse(token)))
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        else if(accountService.updateAccountData(accountRegistration))
             return new ResponseEntity(HttpStatus.OK);
         else
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
+
+    }
+
+    /**
+     * Deletes an account from the system.
+     *
+     * @param username The username of the account being deleted.
+     * @return 200 OK if succeeded else 400 Bad Request.
+     */
+    @RequestMapping(value = "/account/delete", method = RequestMethod.DELETE)
+    ResponseEntity delete(String username) {
+        if(accountService.deleteAccount(username))
+            return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Checks if user token is valid.
+     *
+     * @param token The token sent by the user
+     * @return 200 OK if token is valid else 401 UNAUTHORIZED
+     */
+    @RequestMapping(value = "/account/authenticated", method = RequestMethod.GET)
+    ResponseEntity isAuthenticated(@RequestBody String token) {
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }
