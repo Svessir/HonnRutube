@@ -7,7 +7,9 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.domain;
+package is.ru.honn.rutube.domain.account;
+
+import is.ru.honn.rutube.domain.validator.AccountRegistrationValidator;
 
 /**
  * The account registration class.
@@ -57,7 +59,16 @@ public class AccountRegistration extends Account {
      */
     @Override
     public String toString() {
-        return "username: " + username + " password: " + password
+        return "username: " + getUsername() + " password: " + getPassword()
                 + " repeatedPassword: " + repeatedPassword;
+    }
+
+    /**
+     * Initializes the class with
+     */
+    @Override
+    public void initialize() {
+        clearValidators();
+        addValidator(new AccountRegistrationValidator(this));
     }
 }

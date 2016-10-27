@@ -9,9 +9,9 @@
 
 package is.ru.honn.rutube.services;
 
-import is.ru.honn.rutube.domain.Account;
-import is.ru.honn.rutube.domain.AccountRegistration;
-import is.ru.honn.rutube.domain.Token;
+import is.ru.honn.rutube.domain.account.Account;
+import is.ru.honn.rutube.domain.account.AccountRegistration;
+import is.ru.honn.rutube.domain.account.Token;
 
 /**
  * The interface for the account services
@@ -26,7 +26,7 @@ public interface AccountService {
      * @param accountRegistration The account registration form.
      * @return The account if the registration succeeded else null.
      */
-    boolean register(AccountRegistration accountRegistration);
+    void register(AccountRegistration accountRegistration) throws AccountServiceException;
 
     /**
      * Updates account data.
@@ -40,7 +40,7 @@ public interface AccountService {
      *
      * @param account The account login form.
      * @return The authentication token for the account if
-     *         the login succeeded else false.
+     *         the login succeeded else null.
      */
     Token login(Account account);
 

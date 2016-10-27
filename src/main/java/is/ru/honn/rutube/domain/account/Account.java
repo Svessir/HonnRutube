@@ -7,7 +7,14 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.domain;
+package is.ru.honn.rutube.domain.account;
+
+import is.ru.honn.rutube.domain.validator.AccountValidator;
+import is.ru.honn.rutube.domain.validator.Validatable;
+import is.ru.honn.rutube.domain.validator.Validator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Account domain class.
@@ -15,9 +22,10 @@ package is.ru.honn.rutube.domain;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public class Account {
-    protected String username;
-    protected String password;
+public class Account implements Validatable{
+    private String username;
+    private String password;
+    protected List<Validator> validators = new ArrayList<Validator>();
 
     /**
      * Default constructor
@@ -71,10 +79,49 @@ public class Account {
     }
 
     /**
+     * Validate the account information.
+     *
+     * @return true if account information are valid else false
+     */
+    @Override
+    public boolean validate() {
+        for(Validator validator : validators) {
+            if(!validator.validate())
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Adds a validator to the list of validators to
+     * validate this object.
+     *
+     * @param validator A validator to validate accounts.
+     */
+    public void addValidator(Validator validator) {
+        validators.add(validator);
+    }
+
+    /**
      * @return Account fields as string.
      */
     @Override
     public String toString() {
         return "username: " + username + " password: " + password;
+    }
+
+    /**
+     * Initializes account validators.
+     */
+    public void initialize() {
+        clearValidators();
+        addValidator(new AccountValidator(this));
+    }
+
+    /**
+     * Clears the validator list.
+     */
+    protected void clearValidators() {
+        validators.clear();
     }
 }
