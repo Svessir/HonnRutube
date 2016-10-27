@@ -35,4 +35,12 @@ public interface AccountDataGateway {
      * @return The account if found else null.
      */
     Account getAccountByUsername(String username);
+
+    /**
+     * Deletes an account from the database.
+     *
+     * @param username The unique username of the account being deleted.
+     * @return true if deletion succeeded else false.
+     */
+    boolean deleteAccount(String username);
 }

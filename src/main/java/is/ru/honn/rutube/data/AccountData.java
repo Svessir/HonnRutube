@@ -27,7 +27,7 @@ public class AccountData implements AccountDataGateway {
      */
     @Override
     public void addAccount(Account account) throws AccountDataGatewayException {
-        throw new AccountDataGatewayException("Duplicate add");
+        throw new AccountDataGatewayException("Duplicate add"); // TODO: real implementaiton
     }
 
     /**
@@ -40,5 +40,16 @@ public class AccountData implements AccountDataGateway {
     @Override
     public Account getAccountByUsername(String username) {
         return new Account(1, "Sverrir", "hw33"); // TODO: real implementaiton
+    }
+
+    /**
+     * Deletes an account from the database.
+     *
+     * @param username The unique username of the account being deleted.
+     * @return true if deletion succeeded else false.
+     */
+    @Override
+    public boolean deleteAccount(String username) {
+        return true; // TODO: real implementaiton
     }
 }

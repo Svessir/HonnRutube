@@ -91,14 +91,15 @@ public class RuTubeAccountService implements AccountService {
     }
 
     /**
-     * Deletes and account from the system.
+     * Deletes an account from the system.
      *
      * @param username The username of the account being deleted.
      * @return true if deletion succeeded else false.
      */
     @Override
     public boolean deleteAccount(String username) {
-        return false;
+
+        return true;
     }
 
     /**

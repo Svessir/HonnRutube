@@ -55,7 +55,7 @@ public class AccountController {
         }
         catch (AccountServiceException ase)
         {
-            return new ResponseEntity<String>(ase.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ase.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -71,7 +71,7 @@ public class AccountController {
     ResponseEntity<TokenDTO> authenticate(@RequestBody Account account) {
         Token token = accountService.login(account);
         if(token != null)
-            return new ResponseEntity<TokenDTO>(new TokenDTO(token.encode()), HttpStatus.OK);
+            return new ResponseEntity<>(new TokenDTO(token.encode()), HttpStatus.OK);
         else
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -101,8 +101,9 @@ public class AccountController {
      * @param username The username of the account being deleted.
      * @return 200 OK if succeeded else 400 Bad Request.
      */
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    ResponseEntity delete(String username) {
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity delete(@RequestBody String username) {
         if(accountService.deleteAccount(username))
             return new ResponseEntity(HttpStatus.OK);
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -118,10 +119,10 @@ public class AccountController {
     ResponseEntity<PartialAccountDTO> isAuthenticated(@RequestHeader(name = "Token") String token) {
         Token authenticationToken = accountService.isValidAccountToken(token);
         if(authenticationToken != null)
-            return new ResponseEntity<PartialAccountDTO>(new PartialAccountDTO(
+            return new ResponseEntity<>(new PartialAccountDTO(
                     authenticationToken.getUserId(),
                     authenticationToken.getUsername()
             ),HttpStatus.OK);
-        return new ResponseEntity<PartialAccountDTO>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
