@@ -6,6 +6,9 @@
     <bean id="accountService" class="is.ru.honn.rutube.services.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
     </bean>
+    <bean id="userService" class="is.ru.honn.rutube.services.RuTubeUserService">
+
+    </bean>
 
     <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData"/>
 </beans>
