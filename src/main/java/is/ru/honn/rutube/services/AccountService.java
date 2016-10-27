@@ -50,7 +50,7 @@ public interface AccountService {
      * @param token The authentication token being validated.
      * @return true if the token is valid else false.
      */
-    boolean isValidAccountToken(Token token);
+    boolean isValidAccountToken(String token);
 
     /**
      * Deletes and account from the system.

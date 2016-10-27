@@ -9,6 +9,7 @@
 
 package is.ru.honn.rutube.domain.account;
 
+import is.ru.honn.rutube.domain.validator.TokenValidator;
 import is.ru.honn.rutube.domain.validator.Validatable;
 import is.ru.honn.rutube.domain.validator.Validator;
 
@@ -20,6 +21,7 @@ import is.ru.honn.rutube.domain.validator.Validator;
  */
 public class Token  implements Validatable {
 
+    private int userId;
     private String username;
     private String password;
     private long expires;
@@ -37,7 +39,9 @@ public class Token  implements Validatable {
      * @param account The account being issued a token.
      */
     public Token(Account account) {
+        this.userId = account.getUserId();
         this.username = account.getUsername();
+
         //Expires after 60 seconds;
         this.expires = System.currentTimeMillis() + (60L * 1000L);
     }
@@ -47,7 +51,8 @@ public class Token  implements Validatable {
      * @param password The password of the user.
      * @param expires The time this token expires.
      */
-    public Token(String username, String password, long expires) {
+    public Token(int userId, String username, String password, long expires) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.expires = expires;
@@ -60,7 +65,16 @@ public class Token  implements Validatable {
      * @return The token object.
      */
     public static Token parse(String token) {
-        return new Token();
+        String[] parts = token.split(".");
+
+        if(parts.length != 4)
+            return null;
+
+        int userId = Integer.parseInt(parts[0]);
+        String username = parts[1];
+        String password = parts[2];
+        long expires = Long.parseLong(parts[3]);
+        return new Token(userId, username, password, expires);
     }
 
     /**
@@ -88,6 +102,7 @@ public class Token  implements Validatable {
      */
     @Override
     public void initialize() {
+        addValidator(new TokenValidator(this));
     }
 
     /**
@@ -106,5 +121,42 @@ public class Token  implements Validatable {
      */
     public void setExpires(long expires) {
         this.expires = expires;
+    }
+
+    /**
+     * Get the username of this token.
+     *
+     * @return The username of the account this token is issued to.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Get the password of this token.
+     *
+     * @return The password of the account this token is issued to.
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Get the user id of this token.
+     *
+     * @return The user id of the account this token is issued to.
+     */
+    public int getUserId() {
+        return userId;
+    }
+
+    /**
+     * Encodes this token to header format.
+     *
+     * @return token to header format.
+     */
+    @Override
+    public String toString() {
+        return userId + "." + username + "." + password + "." + expires;
     }
 }

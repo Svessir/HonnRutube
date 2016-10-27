@@ -23,6 +23,7 @@ import java.util.List;
  * @version 1.0, 26 okt. 2016
  */
 public class Account implements Validatable{
+    private int userId;
     private String username;
     private String password;
     protected List<Validator> validators = new ArrayList<Validator>();
@@ -37,7 +38,8 @@ public class Account implements Validatable{
      * @param username The account username.
      * @param password The account password.
      */
-    public Account(String username, String password) {
+    public Account(int userId, String username, String password) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
     }
@@ -123,5 +125,23 @@ public class Account implements Validatable{
      */
     protected void clearValidators() {
         validators.clear();
+    }
+
+    /**
+     * Gets the id of the user account.
+     *
+     * @return The id of the account.
+     */
+    public int getUserId() {
+        return userId;
+    }
+
+    /**
+     * Sets the id of the account.
+     *
+     * @param userId Sets the id of the account.
+     */
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

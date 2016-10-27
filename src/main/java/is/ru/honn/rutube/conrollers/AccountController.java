@@ -61,16 +61,16 @@ public class AccountController {
      * The controller method that handles authentication/login to RuTube.
      *
      * @param account The login form.
-     * @return //TODO: decide on proper return
+     * @return Token header and 200 OK on success else 401 UNAUTHORIZED.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Token> authenticate(@RequestBody Account account) {
+    ResponseEntity<String> authenticate(@RequestBody Account account) {
         Token token = accountService.login(account);
 
         if(token != null)
-            return new ResponseEntity<Token>(token, HttpStatus.OK);
+            return new ResponseEntity<String>(token.toString(), HttpStatus.OK);
         else
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -83,7 +83,7 @@ public class AccountController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
                           @RequestHeader(name = "Token", required = false) String token) {
-        if(!accountService.isValidAccountToken(Token.parse(token)))
+        if(!accountService.isValidAccountToken(token))
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         else if(accountService.updateAccountData(accountRegistration))
             return new ResponseEntity(HttpStatus.OK);
@@ -113,7 +113,7 @@ public class AccountController {
      */
     @RequestMapping(value = "/authenticated", method = RequestMethod.GET)
     ResponseEntity isAuthenticated(@RequestBody String token) {
-        if(accountService.isValidAccountToken(Token.parse(token)))
+        if(accountService.isValidAccountToken(token))
             return new ResponseEntity(HttpStatus.OK);
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }

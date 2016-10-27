@@ -9,6 +9,7 @@
 
 package is.ru.honn.rutube.domain.validator;
 
+import is.ru.honn.rutube.domain.account.Account;
 import is.ru.honn.rutube.domain.account.Token;
 
 /**
@@ -37,6 +38,8 @@ public class TokenValidator implements Validator {
      */
     @Override
     public boolean validate() {
-        return token.getExpires() <= System.currentTimeMillis();
+        Account account = new Account(token.getUserId(), token.getUsername(), token.getPassword());
+        account.initialize();
+        return account.validate() && token.getExpires() <= System.currentTimeMillis();
     }
 }
