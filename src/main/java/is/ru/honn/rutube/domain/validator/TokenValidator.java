@@ -40,6 +40,6 @@ public class TokenValidator implements Validator {
     public boolean validate() {
         Account account = new Account(token.getUserId(), token.getUsername(), token.getPassword());
         account.initialize();
-        return account.validate() && token.getExpires() <= System.currentTimeMillis();
+        return account.validate() && System.currentTimeMillis() <= token.getExpires() ;
     }
 }

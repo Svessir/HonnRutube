@@ -48,9 +48,9 @@ public interface AccountService {
      * Checks if an authentication token is valid.
      *
      * @param token The authentication token being validated.
-     * @return true if the token is valid else false.
+     * @return The token as an object if valid else null.
      */
-    boolean isValidAccountToken(String token);
+    Token isValidAccountToken(String token);
 
     /**
      * Deletes and account from the system.

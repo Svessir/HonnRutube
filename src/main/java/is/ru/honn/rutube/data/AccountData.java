@@ -39,6 +39,6 @@ public class AccountData implements AccountDataGateway {
      */
     @Override
     public Account getAccountByUsername(String username) {
-        return null;
+        return new Account(1, "Sverrir", "hw33"); // TODO: real implementaiton
     }
 }

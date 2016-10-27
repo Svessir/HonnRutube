@@ -13,6 +13,11 @@ import is.ru.honn.rutube.domain.validator.TokenValidator;
 import is.ru.honn.rutube.domain.validator.Validatable;
 import is.ru.honn.rutube.domain.validator.Validator;
 
+
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+import java.util.logging.Logger;
+
 /**
  * Authentication token for RuTube.
  *
@@ -26,6 +31,7 @@ public class Token  implements Validatable {
     private String password;
     private long expires;
     private Validator tokenValidator;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     /**
      * Default constructor
@@ -41,6 +47,7 @@ public class Token  implements Validatable {
     public Token(Account account) {
         this.userId = account.getUserId();
         this.username = account.getUsername();
+        this.password = account.getPassword();
 
         //Expires after 60 seconds;
         this.expires = System.currentTimeMillis() + (60L * 1000L);
@@ -65,15 +72,21 @@ public class Token  implements Validatable {
      * @return The token object.
      */
     public static Token parse(String token) {
-        String[] parts = token.split(".");
+        String[] parts = token.split("\\.");
 
         if(parts.length != 4)
             return null;
 
-        int userId = Integer.parseInt(parts[0]);
-        String username = parts[1];
-        String password = parts[2];
-        long expires = Long.parseLong(parts[3]);
+        int userId;
+        String username;
+        String password;
+        long expires;
+
+        userId = Integer.parseInt(new String(Base64.getDecoder().decode(parts[0])));
+        username = new String(Base64.getDecoder().decode(parts[1]));
+        password = new String(Base64.getDecoder().decode(parts[2]));
+        expires = Long.parseLong(new String(Base64.getDecoder().decode(parts[3])));
+
         return new Token(userId, username, password, expires);
     }
 
@@ -151,12 +164,36 @@ public class Token  implements Validatable {
     }
 
     /**
-     * Encodes this token to header format.
+     * Encodes this token to string header format.
      *
-     * @return token to header format.
+     * @return token to string header format.
      */
     @Override
     public String toString() {
         return userId + "." + username + "." + password + "." + expires;
+    }
+
+    /**
+     * Encodes this token to header format.
+     *
+     * @return Encodes this token.
+     */
+    public String encode() {
+        String encodedId = "";
+        String encodedUsername = "";
+        String encodedPassword = "";
+        String encodedExpires = "";
+        try
+        {
+            encodedId = Base64.getEncoder().encodeToString(Integer.toString(userId).getBytes("UTF-8"));
+            encodedUsername = Base64.getEncoder().encodeToString(username.getBytes("UTF-8"));
+            encodedPassword = Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
+            encodedExpires = Base64.getEncoder().encodeToString(Long.toString(expires).getBytes("UTF-8"));
+        }
+        catch (UnsupportedEncodingException uex)
+        {
+            logger.severe("Token encoding error: " + uex.getMessage());
+        }
+        return encodedId + "." + encodedUsername + "." + encodedPassword + "." + encodedExpires;
     }
 }

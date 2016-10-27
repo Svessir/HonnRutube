@@ -12,6 +12,8 @@ package is.ru.honn.rutube.conrollers;
 import is.ru.honn.rutube.domain.account.Account;
 import is.ru.honn.rutube.domain.account.AccountRegistration;
 import is.ru.honn.rutube.domain.account.Token;
+import is.ru.honn.rutube.domain.account.dto.PartialAccountDTO;
+import is.ru.honn.rutube.domain.account.dto.TokenDTO;
 import is.ru.honn.rutube.services.AccountService;
 import is.ru.honn.rutube.services.AccountServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +65,13 @@ public class AccountController {
      * @param account The login form.
      * @return Token header and 200 OK on success else 401 UNAUTHORIZED.
      */
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<String> authenticate(@RequestBody Account account) {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<TokenDTO> authenticate(@RequestBody Account account) {
         Token token = accountService.login(account);
-
         if(token != null)
-            return new ResponseEntity<String>(token.toString(), HttpStatus.OK);
+            return new ResponseEntity<TokenDTO>(new TokenDTO(token.encode()), HttpStatus.OK);
         else
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -83,7 +86,7 @@ public class AccountController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
                           @RequestHeader(name = "Token", required = false) String token) {
-        if(!accountService.isValidAccountToken(token))
+        if(accountService.isValidAccountToken(token) != null)
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         else if(accountService.updateAccountData(accountRegistration))
             return new ResponseEntity(HttpStatus.OK);
@@ -112,9 +115,13 @@ public class AccountController {
      * @return 200 OK if token is valid else 401 UNAUTHORIZED
      */
     @RequestMapping(value = "/authenticated", method = RequestMethod.GET)
-    ResponseEntity isAuthenticated(@RequestBody String token) {
-        if(accountService.isValidAccountToken(token))
-            return new ResponseEntity(HttpStatus.OK);
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    ResponseEntity<PartialAccountDTO> isAuthenticated(@RequestHeader(name = "Token") String token) {
+        Token authenticationToken = accountService.isValidAccountToken(token);
+        if(authenticationToken != null)
+            return new ResponseEntity<PartialAccountDTO>(new PartialAccountDTO(
+                    authenticationToken.getUserId(),
+                    authenticationToken.getUsername()
+            ),HttpStatus.OK);
+        return new ResponseEntity<PartialAccountDTO>(HttpStatus.UNAUTHORIZED);
     }
 }

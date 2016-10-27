@@ -79,13 +79,15 @@ public class RuTubeAccountService implements AccountService {
      * Checks if an authentication token is valid.
      *
      * @param token The authentication token being validated.
-     * @return true if the token is valid else false.
+     * @return The token as an object if valid else null.
      */
     @Override
-    public boolean isValidAccountToken(String token) {
+    public Token isValidAccountToken(String token) {
         Token authenticationToken = Token.parse(token);
+        if(authenticationToken == null)
+            return null;
         authenticationToken.initialize();
-        return authenticationToken.validate();
+        return authenticationToken.validate() ? authenticationToken : null;
     }
 
     /**
