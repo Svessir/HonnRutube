@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="accountService" class="is.ru.honn.rutube.services.RuTubeAccountService">
+    <bean id="accountService" class="is.ru.honn.rutube.services.account.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
     </bean>
     <bean id="userService" class="is.ru.honn.rutube.services.RuTubeUserService">

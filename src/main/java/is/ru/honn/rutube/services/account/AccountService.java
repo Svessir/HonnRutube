@@ -7,7 +7,7 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.services;
+package is.ru.honn.rutube.services.account;
 
 import is.ru.honn.rutube.domain.account.Account;
 import is.ru.honn.rutube.domain.account.AccountRegistration;
@@ -28,14 +28,15 @@ public interface AccountService {
      */
     void register(AccountRegistration accountRegistration) throws AccountServiceException;
 
+
     /**
      * Updates account data.
      *
      * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
-     * @return true if update succeeded else false.
+     * @throws AccountServiceException If update fails.
      */
-    boolean updateAccountData(int userId, AccountRegistration updatedAccountRegistration);
+    void updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException;
 
     /**
      * Login to account.

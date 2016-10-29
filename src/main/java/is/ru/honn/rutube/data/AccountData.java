@@ -13,7 +13,6 @@ import is.ru.honn.rutube.domain.account.Account;
 import is.ruframework.data.RuData;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -36,11 +35,18 @@ public class AccountData extends RuData implements AccountDataGateway {
      */
     @Override
     public void addAccount(Account account) throws AccountDataGatewayException {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
-                .withTableName("Account")
-                .usingGeneratedKeyColumns("userId");
-        SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(account);
-        insert.executeAndReturnKey(namedParameters).intValue();
+        try
+        {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
+                    .withTableName("Account")
+                    .usingGeneratedKeyColumns("userId");
+            SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(account);
+            insert.executeAndReturnKey(namedParameters).intValue();
+        }
+        catch (DataAccessException daex)
+        {
+            throw new AccountDataGatewayException("Duplicate add.", daex.getCause());
+        }
     }
 
     /**
