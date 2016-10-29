@@ -35,11 +35,21 @@ public class Account implements Validatable{
     }
 
     /**
+     * @param userId The id of the account.
      * @param username The account username.
      * @param password The account password.
      */
     public Account(int userId, String username, String password) {
         this.userId = userId;
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * @param username The account username.
+     * @param password The account password.
+     */
+    public Account(String username, String password) {
         this.username = username;
         this.password = password;
     }

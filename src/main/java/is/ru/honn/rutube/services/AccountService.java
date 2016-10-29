@@ -21,7 +21,7 @@ import is.ru.honn.rutube.domain.account.Token;
  */
 public interface AccountService {
     /**
-     * registers new account.
+     * Registers new account.
      *
      * @param accountRegistration The account registration form.
      * @return The account if the registration succeeded else null.
@@ -31,9 +31,11 @@ public interface AccountService {
     /**
      * Updates account data.
      *
+     * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
+     * @return true if update succeeded else false.
      */
-    boolean updateAccountData(AccountRegistration updatedAccountRegistration);
+    boolean updateAccountData(int userId, AccountRegistration updatedAccountRegistration);
 
     /**
      * Login to account.

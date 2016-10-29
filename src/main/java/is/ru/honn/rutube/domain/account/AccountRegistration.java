@@ -31,8 +31,8 @@ public class AccountRegistration extends Account {
      * @param password The accountRegistration password.
      * @param repeatedPassword The accountRegistration repeated password.
      */
-    public AccountRegistration(int userid, String username, String password, String repeatedPassword) {
-        super(userid, username, password);
+    public AccountRegistration(String username, String password, String repeatedPassword) {
+        super(username, password);
         this.repeatedPassword = repeatedPassword;
     }
 

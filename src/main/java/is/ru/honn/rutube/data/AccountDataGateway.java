@@ -10,6 +10,7 @@
 package is.ru.honn.rutube.data;
 
 import is.ru.honn.rutube.domain.account.Account;
+import is.ruframework.data.RuDataAccess;
 
 /**
  * The API for the account data gateway.
@@ -17,7 +18,7 @@ import is.ru.honn.rutube.domain.account.Account;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public interface AccountDataGateway {
+public interface AccountDataGateway extends RuDataAccess {
 
     /**
      * Adds a new account into the system database.
@@ -40,7 +41,14 @@ public interface AccountDataGateway {
      * Deletes an account from the database.
      *
      * @param username The unique username of the account being deleted.
-     * @return true if deletion succeeded else false.
+     * @return The account that was deleted, null if deletion failed.
      */
-    boolean deleteAccount(String username);
+    Account deleteAccount(String username);
+
+    /**
+     * Updates account information.
+     *
+     * @param account The new account information.
+     */
+    void updateAccount(int userId, Account account);
 }

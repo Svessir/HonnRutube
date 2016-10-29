@@ -69,7 +69,7 @@ public class Token  implements Validatable {
      * Parses a token string into a token object.
      *
      * @param token The token string being parsed.
-     * @return The token object.
+     * @return The token object if parse succeeded else null.
      */
     public static Token parse(String token) {
         String[] parts = token.split("\\.");
@@ -82,10 +82,17 @@ public class Token  implements Validatable {
         String password;
         long expires;
 
-        userId = Integer.parseInt(new String(Base64.getDecoder().decode(parts[0])));
-        username = new String(Base64.getDecoder().decode(parts[1]));
-        password = new String(Base64.getDecoder().decode(parts[2]));
-        expires = Long.parseLong(new String(Base64.getDecoder().decode(parts[3])));
+        try
+        {
+            userId = Integer.parseInt(new String(Base64.getDecoder().decode(parts[0])));
+            username = new String(Base64.getDecoder().decode(parts[1]));
+            password = new String(Base64.getDecoder().decode(parts[2]));
+            expires = Long.parseLong(new String(Base64.getDecoder().decode(parts[3])));
+        }
+        catch (NumberFormatException nfex)
+        {
+            return null;
+        }
 
         return new Token(userId, username, password, expires);
     }

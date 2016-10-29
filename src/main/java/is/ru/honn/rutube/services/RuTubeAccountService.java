@@ -28,7 +28,7 @@ public class RuTubeAccountService implements AccountService {
     public RuTubeAccountService() {}
 
     /**
-     * registers new account.
+     * Registers new account.
      *
      * @param accountRegistration The account registration form.
      * @return The account if the registration succeeded else null.
@@ -42,9 +42,11 @@ public class RuTubeAccountService implements AccountService {
         try
         {
             accountDataGateway.addAccount(accountRegistration);
+            // TODO: Contact UserService to add user profile to database.
         }
         catch (AccountDataGatewayException adge)
         {
+            // TODO: Rewind on failure.
             throw new AccountServiceException("Account could not be persisted into database", adge);
         }
     }
@@ -52,10 +54,17 @@ public class RuTubeAccountService implements AccountService {
     /**
      * Updates account data.
      *
+     * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
+     * @return true if update succeeded else false.
      */
     @Override
-    public boolean updateAccountData(AccountRegistration updatedAccountRegistration) {
+    public boolean updateAccountData(int userId, AccountRegistration updatedAccountRegistration) {
+        updatedAccountRegistration.initialize();
+        if(updatedAccountRegistration.validate()) {
+            accountDataGateway.updateAccount(userId, updatedAccountRegistration);
+            return true;
+        }
         return false;
     }
 
@@ -98,8 +107,10 @@ public class RuTubeAccountService implements AccountService {
      */
     @Override
     public boolean deleteAccount(String username) {
-
-        return true;
+        Account deletedAccount = accountDataGateway.deleteAccount(username);
+        // TODO Contact UserService to delete userProfile
+        // TODO: Rewind on failure.
+        return deletedAccount != null;
     }
 
     /**

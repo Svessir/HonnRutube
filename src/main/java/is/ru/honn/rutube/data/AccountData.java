@@ -10,6 +10,15 @@
 package is.ru.honn.rutube.data;
 
 import is.ru.honn.rutube.domain.account.Account;
+import is.ruframework.data.RuData;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 /**
  * RuTubes account data gateway implementation.
@@ -17,7 +26,7 @@ import is.ru.honn.rutube.domain.account.Account;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public class AccountData implements AccountDataGateway {
+public class AccountData extends RuData implements AccountDataGateway {
 
     /**
      * Adds a new account into the system database.
@@ -27,7 +36,11 @@ public class AccountData implements AccountDataGateway {
      */
     @Override
     public void addAccount(Account account) throws AccountDataGatewayException {
-        throw new AccountDataGatewayException("Duplicate add"); // TODO: real implementaiton
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
+                .withTableName("Account")
+                .usingGeneratedKeyColumns("userId");
+        SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(account);
+        insert.executeAndReturnKey(namedParameters).intValue();
     }
 
     /**
@@ -39,17 +52,53 @@ public class AccountData implements AccountDataGateway {
      */
     @Override
     public Account getAccountByUsername(String username) {
-        return new Account(1, "Sverrir", "hw33"); // TODO: real implementaiton
+        try
+        {
+            String sql = "SELECT * FROM Account A WHERE A.username = :username;";
+            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+            SqlParameterSource sqlParameters = new MapSqlParameterSource("username", username);
+            Account account = (Account) template
+                    .queryForObject(sql, sqlParameters, new BeanPropertyRowMapper(Account.class));
+            return account;
+        }
+        catch (DataAccessException daex)
+        {
+            return null;
+        }
     }
 
     /**
      * Deletes an account from the database.
      *
      * @param username The unique username of the account being deleted.
-     * @return true if deletion succeeded else false.
+     * @return The account that was deleted, null if deletion failed.
      */
     @Override
-    public boolean deleteAccount(String username) {
-        return true; // TODO: real implementaiton
+    public Account deleteAccount(String username) {
+        Account account = getAccountByUsername(username);
+
+        if(account == null)
+            return null;
+
+        try
+        {
+            String sql = "DELETE FROM Account WHERE username = :username;";
+            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+            SqlParameterSource sqlParameters = new MapSqlParameterSource("username", username);
+            template.update(sql, sqlParameters);
+        }
+        catch (DataAccessException daex)
+        {
+            // Deletion failed.
+            return null;
+        }
+
+        return account;
+    }
+
+
+    @Override
+    public void updateAccount(int userId, Account account) {
+
     }
 }

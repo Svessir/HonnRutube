@@ -20,6 +20,7 @@ import is.ru.honn.rutube.domain.account.Account;
  *  - Password length is lesser than 32.
  *  - Password length is greater than 4
  *  - Password includes a number.
+ *  - Neither password nor username include a "."
  *
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
@@ -49,6 +50,7 @@ public class AccountValidator implements Validator{
                 username.length() <= 0 || password.length() <= 0 ||
                 username.length() > 32 || password.length() > 32 ||
                 Character.isDigit(username.charAt(0)) ||
+                username.contains(".") || password.contains(".") ||
                 !containsNumber(password))
             return false;
         return true;

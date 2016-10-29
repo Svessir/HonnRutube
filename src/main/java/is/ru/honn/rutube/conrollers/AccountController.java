@@ -16,6 +16,7 @@ import is.ru.honn.rutube.domain.account.dto.PartialAccountDTO;
 import is.ru.honn.rutube.domain.account.dto.TokenDTO;
 import is.ru.honn.rutube.services.AccountService;
 import is.ru.honn.rutube.services.AccountServiceException;
+import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,11 +52,11 @@ public class AccountController {
         try
         {
             accountService.register(accountRegistration);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity<Object>(HttpStatus.OK);
         }
         catch (AccountServiceException ase)
         {
-            return new ResponseEntity<>(ase.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(ase.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -71,7 +72,7 @@ public class AccountController {
     ResponseEntity<TokenDTO> authenticate(@RequestBody Account account) {
         Token token = accountService.login(account);
         if(token != null)
-            return new ResponseEntity<>(new TokenDTO(token.encode()), HttpStatus.OK);
+            return new ResponseEntity<TokenDTO>(new TokenDTO(token.encode()), HttpStatus.OK);
         else
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -86,9 +87,11 @@ public class AccountController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
                           @RequestHeader(name = "Token", required = false) String token) {
-        if(accountService.isValidAccountToken(token) != null)
+        Token authenticationToken;
+        if((authenticationToken = accountService.isValidAccountToken(token)) != null)
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        else if(accountService.updateAccountData(accountRegistration))
+        else if(accountService.updateAccountData(authenticationToken.getUserId(),
+                accountRegistration))
             return new ResponseEntity(HttpStatus.OK);
         else
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -98,13 +101,13 @@ public class AccountController {
     /**
      * Deletes an account from the system.
      *
-     * @param username The username of the account being deleted.
+     * @param account An object containing a username field.
      * @return 200 OK if succeeded else 400 Bad Request.
      */
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity delete(@RequestBody String username) {
-        if(accountService.deleteAccount(username))
+    ResponseEntity delete(@RequestBody PartialAccountDTO account) {
+        if(accountService.deleteAccount(account.getUsername()))
             return new ResponseEntity(HttpStatus.OK);
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
@@ -119,10 +122,10 @@ public class AccountController {
     ResponseEntity<PartialAccountDTO> isAuthenticated(@RequestHeader(name = "Token") String token) {
         Token authenticationToken = accountService.isValidAccountToken(token);
         if(authenticationToken != null)
-            return new ResponseEntity<>(new PartialAccountDTO(
+            return new ResponseEntity<PartialAccountDTO>(new PartialAccountDTO(
                     authenticationToken.getUserId(),
                     authenticationToken.getUsername()
             ),HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<PartialAccountDTO>(HttpStatus.UNAUTHORIZED);
     }
 }

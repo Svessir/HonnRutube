@@ -22,6 +22,11 @@ public class PartialAccountDTO {
     private String username;
 
     /**
+     * Default constructor.
+     */
+    public PartialAccountDTO() {}
+
+    /**
      * @param userId The id of the account.
      * @param username The username of the account.
      */
@@ -46,5 +51,23 @@ public class PartialAccountDTO {
      */
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * Sets the username for this object.
+     *
+     * @param username The username being set.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * Sets the userId for this object.
+     *
+     * @param userId The userId being set.
+     */
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

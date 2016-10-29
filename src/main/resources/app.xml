@@ -10,5 +10,31 @@
 
     </bean>
 
-    <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData"/>
+    <!-- Data Source -->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName">
+            <value>net.sourceforge.jtds.jdbc.Driver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:jtds:sqlserver://localhost:1433/rutube;instance=MSSQLSERVER</value>
+        </property>
+        <property name="username">
+            <value>honn</value>
+        </property>
+        <property name="password">
+            <value>honn</value>
+        </property>
+    </bean>
+
+
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
 </beans>
