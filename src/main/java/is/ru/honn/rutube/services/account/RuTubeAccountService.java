@@ -7,7 +7,7 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.services;
+package is.ru.honn.rutube.services.account;
 
 import is.ru.honn.rutube.data.AccountDataGateway;
 import is.ru.honn.rutube.data.AccountDataGatewayException;
@@ -25,6 +25,9 @@ public class RuTubeAccountService implements AccountService {
 
     private AccountDataGateway accountDataGateway;
 
+    /**
+     * Default constructor.
+     */
     public RuTubeAccountService() {}
 
     /**
@@ -37,17 +40,14 @@ public class RuTubeAccountService implements AccountService {
     public void register(AccountRegistration accountRegistration) throws AccountServiceException {
         accountRegistration.initialize();
         if(!accountRegistration.validate())
-            throw new AccountServiceException("Account registration is invalid.");
-
+            throw new AccountServiceException("Account registration is invalid.", AccountServiceErrorCode.SYNTAX_ERROR);
         try
         {
             accountDataGateway.addAccount(accountRegistration);
-            // TODO: Contact UserService to add user profile to database.
         }
         catch (AccountDataGatewayException adge)
         {
-            // TODO: Rewind on failure.
-            throw new AccountServiceException("Account could not be persisted into database", adge);
+            throw new AccountServiceException("Duplicate add.", adge, AccountServiceErrorCode.DUPLICATE_ADD);
         }
     }
 
@@ -56,16 +56,14 @@ public class RuTubeAccountService implements AccountService {
      *
      * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
-     * @return true if update succeeded else false.
+     * @throws AccountServiceException If update fails.
      */
     @Override
-    public boolean updateAccountData(int userId, AccountRegistration updatedAccountRegistration) {
+    public void updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException {
         updatedAccountRegistration.initialize();
         if(updatedAccountRegistration.validate()) {
             accountDataGateway.updateAccount(userId, updatedAccountRegistration);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -73,7 +71,7 @@ public class RuTubeAccountService implements AccountService {
      *
      * @param account The account login form.
      * @return The authentication token for the account if
-     *         the login succeeded else false.
+     *         the login succeeded else null.
      */
     @Override
     public Token login(Account account) {
@@ -95,8 +93,11 @@ public class RuTubeAccountService implements AccountService {
         Token authenticationToken = Token.parse(token);
         if(authenticationToken == null)
             return null;
+
         authenticationToken.initialize();
-        return authenticationToken.validate() ? authenticationToken : null;
+        if(!authenticationToken.validate())
+            return null;
+        return login(new Account(authenticationToken.getUsername(), authenticationToken.getPassword()));
     }
 
     /**
@@ -106,7 +107,7 @@ public class RuTubeAccountService implements AccountService {
      * @return true if deletion succeeded else false.
      */
     @Override
-    public boolean deleteAccount(String username) {
+    public boolean deleteAccount(String username) throws AccountServiceException {
         Account deletedAccount = accountDataGateway.deleteAccount(username);
         // TODO Contact UserService to delete userProfile
         // TODO: Rewind on failure.

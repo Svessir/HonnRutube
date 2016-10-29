@@ -38,7 +38,7 @@ public interface AccountDataGateway extends RuDataAccess {
     Account getAccountByUsername(String username);
 
     /**
-     * Deletes an account from the database.
+     * Deletes account with given username.
      *
      * @param username The unique username of the account being deleted.
      * @return The account that was deleted, null if deletion failed.
