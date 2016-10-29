@@ -10,7 +10,7 @@
 package is.ru.honn.rutube.services;
 
 /**
- * Component description
+ * The interface for the user services
  *
  * @author Kári
  * @version 1.0, 26 okt. 2016
