@@ -26,6 +26,56 @@ public class RuTubeAuthenticationClient implements AuthenticationClient {
     private URL serviceUrl;
 
     /**
+     * Signs up an account on RuTube.
+     *
+     * @param username The username of the new account.
+     * @param password The password of the new account.
+     * @param repeatedPassword The repeated password of the new account.
+     * @return true if sign up succeeded else false.
+     */
+    public boolean signUp(String username, String password, String repeatedPassword) {
+        RestTemplate restTemplate = new RestTemplate();
+        AccountForm accountForm = new AccountForm();
+        accountForm.setUsername(username);
+        accountForm.setPassword(password);
+        accountForm.setRepeatedPassword(repeatedPassword);
+        ResponseEntity response;
+        try
+        {
+            response = restTemplate.postForEntity(serviceUrl.toString() + "/signup/", accountForm, String.class);
+            return response.getStatusCode() == HttpStatus.OK;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Logs in to RuTube.
+     *
+     * @param username The account username.
+     * @param password The account password.
+     * @return The authentication token string if succeeded else null.
+     */
+    public String logIn(String username, String password) {
+        RestTemplate restTemplate = new RestTemplate();
+        AccountForm accountForm = new AccountForm();
+        accountForm.setUsername(username);
+        accountForm.setPassword(password);
+        ResponseEntity<Token> response;
+        try
+        {
+            response = restTemplate.postForEntity(serviceUrl.toString() + "/authenticate/", accountForm, Token.class);
+            return response.getStatusCode() == HttpStatus.OK ? response.getBody().getToken() : null;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    /**
      * Gets the logged in user.
      *
      * @return The logged in user.
@@ -56,5 +106,71 @@ public class RuTubeAuthenticationClient implements AuthenticationClient {
      */
     public void setServiceUrl(URL serviceUrl) {
         this.serviceUrl = serviceUrl;
+    }
+
+    private class AccountForm {
+
+        private String username;
+        private String password;
+        private String repeatedPassword;
+
+        /**
+         * Default constructor
+         */
+        public AccountForm() {}
+
+        /**
+         * Gets username from the account form.
+         *
+         * @return The username.
+         */
+        public String getUsername() {
+            return username;
+        }
+
+        /**
+         * Sets the username of the account form.
+         *
+         * @param username The new username.
+         */
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        /**
+         * Gets the password of the account form.
+         *
+         * @return The password.
+         */
+        public String getPassword() {
+            return password;
+        }
+
+        /**
+         * Sets the password of the account form.
+         *
+         * @param password The password.
+         */
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        /**
+         * Gets the repeated password of the account form.
+         *
+         * @return The repeated password.
+         */
+        public String getRepeatedPassword() {
+            return repeatedPassword;
+        }
+
+        /**
+         * Sets the repeated password of the account form.
+         *
+         * @param repeatedPassword The repeated password.
+         */
+        public void setRepeatedPassword(String repeatedPassword) {
+            this.repeatedPassword = repeatedPassword;
+        }
     }
 }

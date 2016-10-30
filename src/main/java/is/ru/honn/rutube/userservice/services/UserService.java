@@ -21,6 +21,13 @@ import is.ru.honn.rutube.userservice.domain.UserProfile;
 public interface UserService {
 
     /**
+     * Creates userProfile.
+     *
+     * @param userId The userId of the user.
+     */
+    void createUserProfile(int userId) throws UserServiceException;
+
+    /**
      * Get a user.
      *
      * @param userId The userId of the user.
@@ -33,7 +40,7 @@ public interface UserService {
      *
      * @param userId The userId of the user being deleted.
      */
-    void deleteUser(int userId);
+    void deleteUser(int userId) throws UserServiceException;
 
     /**
      * Adds a video to a users favorite list.
@@ -41,7 +48,7 @@ public interface UserService {
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being added.
      */
-    void addVideoToFavorites(int userId, int videoId);
+    void addVideoToFavorites(int userId, int videoId) throws UserServiceException;
 
     /**
      * Deletes a video from a users favorite list.
@@ -49,7 +56,7 @@ public interface UserService {
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being deleted.
      */
-    void deleteVideoFromFavorites(int userId, int videoId);
+    void deleteVideoFromFavorites(int userId, int videoId) throws UserServiceException;
 
     /**
      * Adds a friend to a users list.
@@ -57,7 +64,7 @@ public interface UserService {
      * @param userId The userId of the user.
      * @param friendId The friendId of the user being added.
      */
-    void addUserToCloseFriends(int userId, int friendId);
+    void addUserToCloseFriends(int userId, int friendId) throws UserServiceException;
 
     /**
      * Deleted a friend from a users list.
@@ -65,5 +72,5 @@ public interface UserService {
      * @param userId The userId of the user.
      * @param friendId The friendId og the user being deleted.
      */
-    void deleteUserFromCloseFriends(int userId, int friendId);
+    void deleteUserFromCloseFriends(int userId, int friendId) throws UserServiceException;
 }

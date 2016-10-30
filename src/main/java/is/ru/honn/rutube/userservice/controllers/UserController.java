@@ -12,7 +12,9 @@ package is.ru.honn.rutube.userservice.controllers;
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.authentication.User;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
+import is.ru.honn.rutube.userservice.dto.UserIdDTO;
 import is.ru.honn.rutube.userservice.services.UserService;
+import is.ru.honn.rutube.userservice.services.UserServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,15 +45,41 @@ public class UserController {
     }
 
     /**
+     * Creates a userProfile
      *
-     * @return
+     * @param userId The userId of the user.
+     * @return 200 OK if userProfile is created, 409 CONFLICT if userProfile already exists
+     *          and 404 NOT FOUND if user is null.
      */
-    @RequestMapping(value = "/profile", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity getUserProfile(@RequestHeader(name = "Token", required = false) String token){
+    @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity createUserProfile(@RequestBody int userId){
+        UserProfile userProfile = userService.getUser(userId);
+        if(userProfile != null){
+            try{
+                userService.createUserProfile(userProfile.getId());
+            } catch (UserServiceException e) {
+                return new ResponseEntity(HttpStatus.CONFLICT);
+            }
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+
+    /**
+     * Get a userProfile.
+     *
+     * @param token The token of the user.
+     * @return UserProfile data and HttpStatus.OK if successful
+     *          HttpStatus.UNAUTORIZED otherwise.
+     */
+    @RequestMapping(value = "/profile", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<UserProfile> getUserProfile(@RequestHeader(name = "Token", required = false) String token){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null){
-            userService.getUser(user.getUserId());
-            return new ResponseEntity(HttpStatus.OK);
+            UserProfile userProfile = userService.getUser(user.getUserId());
+            return new ResponseEntity<UserProfile>(userProfile, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -59,18 +87,17 @@ public class UserController {
     /**
      * Deletes a user.
      *
-     * @param userId The id of the user being deleted.
+     * @param userId The userIdDTO of the user being deleted.
      * @return
      */
     @RequestMapping(value = "/profile", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity deleteUser(@RequestHeader(name = "Token", required = false) String token,
-                              @RequestBody int userId){
-        User user = authenticationClient.getLoggedInUser(token);
-        if(user != null) {
-            userService.deleteUser(userId);
-            return new ResponseEntity(HttpStatus.OK);
+    ResponseEntity deleteUser(@RequestBody UserIdDTO userId){
+        try {
+            userService.deleteUser(userId.getUserId());
+        }catch (UserServiceException usex){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     /**
@@ -85,10 +112,14 @@ public class UserController {
                                        @RequestBody int userId, int videoId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
-            // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
-            //return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            userService.addVideoToFavorites(userId, videoId);
-            return new ResponseEntity(HttpStatus.OK);
+            try {
+                // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
+                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                userService.addVideoToFavorites(userId, videoId);
+                return new ResponseEntity(HttpStatus.OK);
+            }catch (UserServiceException usex){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -105,10 +136,14 @@ public class UserController {
                                             @RequestBody int userId, int videoId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
-            // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
-            // return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            userService.deleteVideoFromFavorites(userId, videoId);
-            return new ResponseEntity(HttpStatus.OK);
+            try {
+                // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
+                // return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                userService.deleteVideoFromFavorites(userId, videoId);
+                return new ResponseEntity(HttpStatus.OK);
+            }catch (UserServiceException usex){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
@@ -125,12 +160,14 @@ public class UserController {
                                   @RequestBody int userId, int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
-            UserProfile userProfile = userService.getUser(friendId);
-            if(userProfile != null) {
-                // TODO: make userClient get the user with this friendId, if that user is null. Bad_Request
-                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                userService.addUserToCloseFriends(userId, friendId);
-                return new ResponseEntity(HttpStatus.OK);
+            try {
+                UserProfile userProfile = userService.getUser(friendId);
+                if (userProfile != null) {
+                    userService.addUserToCloseFriends(userId, friendId);
+                    return new ResponseEntity(HttpStatus.OK);
+                }
+            }catch (UserServiceException usex){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -148,12 +185,14 @@ public class UserController {
                                           @RequestBody int userId, int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
-            UserProfile userProfile = userService.getUser(friendId);
-            if(userProfile != null) {
-                // TODO: make userClient get the user with this friendId, if that user is null. Bad_Request
-                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                userService.deleteUserFromCloseFriends(userId, friendId);
-                return new ResponseEntity(HttpStatus.OK);
+            try {
+                UserProfile userProfile = userService.getUser(friendId);
+                if (userProfile != null) {
+                    userService.deleteUserFromCloseFriends(userId, friendId);
+                    return new ResponseEntity(HttpStatus.OK);
+                }
+            }catch (UserServiceException usex){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);

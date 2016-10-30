@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class UserProfile {
     protected int Id;
+    protected String username;
     protected List<Integer> favoriteVideos;
     protected List<Integer> closeFriends;
 
@@ -34,8 +35,9 @@ public class UserProfile {
      *
      * @param id The user id
      */
-    public UserProfile(int id){
+    public UserProfile(int id, String username){
         setId(id);
+        setUsername(username);
         favoriteVideos = new ArrayList<Integer>();
         closeFriends = new ArrayList<Integer>();
     }
@@ -56,6 +58,24 @@ public class UserProfile {
      */
     public void setId(int id) {
         Id = id;
+    }
+
+    /**
+     * Get the username .
+     *
+     * @return The username of the userProfile.
+     */
+    public String getUsername(){
+        return username;
+    }
+
+    /**
+     * Sets the username of the userProfile.
+     *
+     * @param username The username of the userProfile.
+     */
+    public void setUsername(String username){
+        this.username = username;
     }
 
     /**
