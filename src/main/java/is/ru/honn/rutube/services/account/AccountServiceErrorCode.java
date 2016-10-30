@@ -17,5 +17,6 @@ package is.ru.honn.rutube.services.account;
  */
 public enum AccountServiceErrorCode {
     DUPLICATE_ADD,
-    SYNTAX_ERROR
+    SYNTAX_ERROR,
+    NOT_FOUND
 }

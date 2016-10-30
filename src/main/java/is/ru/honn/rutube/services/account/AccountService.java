@@ -34,9 +34,10 @@ public interface AccountService {
      *
      * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
+     * @return The new token for the user.
      * @throws AccountServiceException If update fails.
      */
-    void updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException;
+    Token updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException;
 
     /**
      * Login to account.
@@ -57,9 +58,8 @@ public interface AccountService {
 
     /**
      * Deletes an account from the system.
-     *
      * @param username The username of the account being deleted.
-     * @return true if deletion succeeded else false.
+     * @throws AccountServiceException If the user doesn't exist.
      */
-    boolean deleteAccount(String username);
+    void deleteAccount(String username) throws AccountServiceException;
 }

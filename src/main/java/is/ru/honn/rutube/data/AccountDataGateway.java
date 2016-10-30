@@ -42,13 +42,17 @@ public interface AccountDataGateway extends RuDataAccess {
      *
      * @param username The unique username of the account being deleted.
      * @return The account that was deleted, null if deletion failed.
+     * @throws AccountDataGatewayException On a failed deletion.
      */
-    Account deleteAccount(String username);
+    Account deleteAccount(String username) throws AccountDataGatewayException;
 
     /**
      * Updates account information.
      *
+     * @param userId The id of the user being updated.
      * @param account The new account information.
+     * @return The Account with the new account information.
+     * @throws AccountDataGatewayException If update fails.
      */
-    void updateAccount(int userId, Account account);
+    Account updateAccount(int userId, Account account) throws AccountDataGatewayException;
 }

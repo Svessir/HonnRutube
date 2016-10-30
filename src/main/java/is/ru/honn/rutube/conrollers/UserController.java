@@ -36,8 +36,12 @@ public class UserController {
     private UserService userService;
     private AuthenticationClient authenticationClient;
 
+    /**
+     * @param userService The userService being.
+     * @param authenticationClient A client to communicate with the authentication micro service.
+     */
     @Autowired
-    public UserController(UserService userService, RuTubeAuthenticationClient authenticationClient){
+    public UserController(UserService userService, AuthenticationClient authenticationClient){
         this.userService = userService;
         this.authenticationClient = authenticationClient;
     }
@@ -53,7 +57,7 @@ public class UserController {
             userService.getUser(user.getUserId());
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -70,7 +74,7 @@ public class UserController {
             userService.deleteUser(userId);
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -90,7 +94,7 @@ public class UserController {
             userService.addVideoToFavorites(userId, videoId);
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -110,7 +114,7 @@ public class UserController {
             userService.deleteVideoFromFavorites(userId, videoId);
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -133,7 +137,7 @@ public class UserController {
                 return new ResponseEntity(HttpStatus.OK);
             }
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -156,6 +160,6 @@ public class UserController {
                 return new ResponseEntity(HttpStatus.OK);
             }
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }

@@ -20,6 +20,11 @@ public class TokenDTO {
     private String token;
 
     /**
+     * Default constructor.
+     */
+    public TokenDTO() {}
+
+    /**
      * @param token The token in a string format.
      */
     public TokenDTO(String token) {

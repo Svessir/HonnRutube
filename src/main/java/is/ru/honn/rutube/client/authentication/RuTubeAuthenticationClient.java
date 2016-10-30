@@ -9,6 +9,11 @@
 
 package is.ru.honn.rutube.client.authentication;
 
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URL;
+
 /**
  * Client that communicates with the
  * authentication micro service.
@@ -18,6 +23,8 @@ package is.ru.honn.rutube.client.authentication;
  */
 public class RuTubeAuthenticationClient implements AuthenticationClient {
 
+    private URL serviceUrl;
+
     /**
      * Gets the logged in user.
      *
@@ -25,6 +32,29 @@ public class RuTubeAuthenticationClient implements AuthenticationClient {
      */
     @Override
     public User getLoggedInUser(String token) {
-        return null;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Token", token);
+        HttpEntity entity = new HttpEntity(httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+        try
+        {
+            ResponseEntity<User> response = restTemplate.exchange(serviceUrl.toString() + "/authenticated/",
+                    HttpMethod.GET, entity, User.class);
+            return response.getStatusCode().equals(HttpStatus.OK) ? response.getBody() : null;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the url of the authentication micro service
+     *
+     * @param serviceUrl The url of the authentication micro service.
+     */
+    public void setServiceUrl(URL serviceUrl) {
+        this.serviceUrl = serviceUrl;
     }
 }

@@ -38,11 +38,12 @@ public class RuTubeAccountService implements AccountService {
      */
     @Override
     public void register(AccountRegistration accountRegistration) throws AccountServiceException {
-        accountRegistration.initialize();
-        if(!accountRegistration.validate())
-            throw new AccountServiceException("Account registration is invalid.", AccountServiceErrorCode.SYNTAX_ERROR);
         try
         {
+            accountRegistration.initialize();
+            if(!accountRegistration.validate())
+                throw new AccountServiceException("Account registration is invalid.", AccountServiceErrorCode.SYNTAX_ERROR);
+
             accountDataGateway.addAccount(accountRegistration);
         }
         catch (AccountDataGatewayException adge)
@@ -56,13 +57,24 @@ public class RuTubeAccountService implements AccountService {
      *
      * @param userId The id of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
+     * @return The new token for the user.
      * @throws AccountServiceException If update fails.
      */
     @Override
-    public void updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException {
-        updatedAccountRegistration.initialize();
-        if(updatedAccountRegistration.validate()) {
-            accountDataGateway.updateAccount(userId, updatedAccountRegistration);
+    public Token updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException {
+        try
+        {
+            updatedAccountRegistration.initialize();
+            if(!updatedAccountRegistration.validate())
+                throw new AccountServiceException("Updated account information is invalid. Update aborted.",
+                        AccountServiceErrorCode.SYNTAX_ERROR);
+
+            Account account = accountDataGateway.updateAccount(userId, updatedAccountRegistration);
+            return new Token(account);
+        }
+        catch (AccountDataGatewayException adge)
+        {
+            throw new AccountServiceException(adge.getMessage(), AccountServiceErrorCode.DUPLICATE_ADD);
         }
     }
 
@@ -102,16 +114,20 @@ public class RuTubeAccountService implements AccountService {
 
     /**
      * Deletes an account from the system.
-     *
      * @param username The username of the account being deleted.
-     * @return true if deletion succeeded else false.
+     * @throws AccountServiceException If the user doesn't exist.
      */
     @Override
-    public boolean deleteAccount(String username) throws AccountServiceException {
-        Account deletedAccount = accountDataGateway.deleteAccount(username);
-        // TODO Contact UserService to delete userProfile
-        // TODO: Rewind on failure.
-        return deletedAccount != null;
+    public void deleteAccount(String username) throws AccountServiceException {
+        try
+        {
+            accountDataGateway.deleteAccount(username);
+        }
+        catch (AccountDataGatewayException adgex)
+        {
+            throw new AccountServiceException("Account with the username " + username + " cannot be found.",
+                    adgex.getCause(), AccountServiceErrorCode.NOT_FOUND);
+        }
     }
 
     /**

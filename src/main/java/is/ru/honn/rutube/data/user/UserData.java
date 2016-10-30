@@ -41,7 +41,7 @@ public class UserData extends RuData implements UserDataGateway {
      */
     @Override
     public UserProfile getUserProfile(int userId) {
-        String sql = "SELECT * FROM UserProfile WHERE userId = :id;";
+        String sql = "SELECT * FROM UserProfile WHERE userId = :userId;";
         NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
         SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
         UserProfile userProfile = (UserProfile) template.

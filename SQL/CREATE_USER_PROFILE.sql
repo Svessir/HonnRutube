@@ -1,4 +1,4 @@
 CREATE TABLE UserProfile
 (
-  userId int IDENTITY PRIMARY KEY NOT NULL,
+  userId int PRIMARY KEY NOT NULL,
 )
