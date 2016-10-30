@@ -93,13 +93,13 @@ public class AccountController {
     ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
                           @RequestHeader(name = "Token", required = false) String token) {
         Token authenticationToken;
-        if((authenticationToken = accountService.isValidAccountToken(token)) != null)
+        if((authenticationToken = accountService.isValidAccountToken(token)) == null)
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
         try
         {
-            accountService.updateAccountData(authenticationToken.getUserId(),accountRegistration);
-            return new ResponseEntity(HttpStatus.OK);
+            authenticationToken = accountService.updateAccountData(authenticationToken.getUserId(),accountRegistration);
+            return new ResponseEntity<TokenDTO>(new TokenDTO(authenticationToken.encode()), HttpStatus.OK);
         }
         catch (AccountServiceException asex)
         {
@@ -117,14 +117,22 @@ public class AccountController {
      * Deletes an account from the system.
      *
      * @param account An object containing a username field.
-     * @return 200 OK if succeeded else 400 Bad Request.
+     * @return 200 OK if succeeded else 404 NOT FOUND.
      */
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity delete(@RequestBody PartialAccountDTO account) {
-        if(accountService.deleteAccount(account.getUsername()))
-            return new ResponseEntity(HttpStatus.OK);
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    ResponseEntity<String> delete(@RequestBody PartialAccountDTO account) {
+        try
+        {
+            accountService.deleteAccount(account.getUsername());
+            return new ResponseEntity<String>("Account with username "
+                    + account.getUsername() + " has been successfully deleted.",
+                    HttpStatus.OK);
+        }
+        catch (AccountServiceException asex)
+        {
+            return new ResponseEntity<String>(asex.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     /**

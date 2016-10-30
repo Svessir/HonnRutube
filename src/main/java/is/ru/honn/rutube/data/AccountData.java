@@ -74,37 +74,53 @@ public class AccountData extends RuData implements AccountDataGateway {
     }
 
     /**
-     * Deletes an account from the database.
+     * Deletes account with given username.
      *
      * @param username The unique username of the account being deleted.
      * @return The account that was deleted, null if deletion failed.
+     * @throws AccountDataGatewayException On a failed deletion.
      */
     @Override
-    public Account deleteAccount(String username) {
+    public Account deleteAccount(String username) throws AccountDataGatewayException{
         Account account = getAccountByUsername(username);
 
         if(account == null)
-            return null;
+            throw new AccountDataGatewayException("No account found with that username.");
 
-        try
-        {
-            String sql = "DELETE FROM Account WHERE username = :username;";
-            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
-            SqlParameterSource sqlParameters = new MapSqlParameterSource("username", username);
-            template.update(sql, sqlParameters);
-        }
-        catch (DataAccessException daex)
-        {
-            // Deletion failed.
-            return null;
-        }
+        String sql = "DELETE FROM Account WHERE username = :username;";
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+        SqlParameterSource sqlParameters = new MapSqlParameterSource("username", username);
+        template.update(sql, sqlParameters);
 
         return account;
     }
 
 
+    /**
+     * Updates account information.
+     *
+     * @param userId The id of the user being updated.
+     * @param account The new account information.
+     * @return The Account with the new account information.
+     * @throws AccountDataGatewayException If update fails.
+     */
     @Override
-    public void updateAccount(int userId, Account account) {
+    public Account updateAccount(int userId, Account account) throws AccountDataGatewayException {
+        try
+        {
+            String sql = "UPDATE ACCOUNT " +
+                    "SET username = :username, password = :password " +
+                    "WHERE userId = :userId;";
 
+            account.setUserId(userId);
+            SqlParameterSource sqlParameters = new BeanPropertySqlParameterSource(account);
+            NamedParameterJdbcTemplate update = new NamedParameterJdbcTemplate(getDataSource());
+            update.update(sql, sqlParameters);
+            return account;
+        }
+        catch (DataAccessException daex)
+        {
+            throw new AccountDataGatewayException("Username already exists. Update aborted.", daex.getCause());
+        }
     }
 }
