@@ -1,13 +1,13 @@
 /*************************************************************************************************
  *
- * AccountControllerTest.java - The AccountControllerTest class.
+ * AccountControllerTest11.java - The AccountControllerTest11 class.
  *
  * Copyright (c) 2016 Sverrir Magnússon & Kári Eiríksson. 
  * All rights reserved.
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.conrollers;
+package is.ru.honn.rutube.accountservice.controllers;
 
 import java.net.URL;
 import is.ru.honn.rutube.accountservice.domain.Account;
