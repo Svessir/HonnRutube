@@ -10,10 +10,10 @@
 package is.ru.honn.rutube.conrollers;
 
 import java.net.URL;
-import is.ru.honn.rutube.domain.account.Account;
-import is.ru.honn.rutube.domain.account.AccountRegistration;
-import is.ru.honn.rutube.domain.account.dto.PartialAccountDTO;
-import is.ru.honn.rutube.domain.account.dto.TokenDTO;
+import is.ru.honn.rutube.accountservice.domain.Account;
+import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
+import is.ru.honn.rutube.accountservice.dto.PartialAccountDTO;
+import is.ru.honn.rutube.accountservice.dto.TokenDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

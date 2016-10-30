@@ -3,12 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="accountService" class="is.ru.honn.rutube.services.account.RuTubeAccountService">
+    <bean id="accountService" class="is.ru.honn.rutube.accountservice.services.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
     </bean>
 
 
-    <bean id="userService" class="is.ru.honn.rutube.services.user.RuTubeUserService">
+    <bean id="userService" class="is.ru.honn.rutube.userservice.services.RuTubeUserService">
         <property name="userDataGateway" ref="userDataGateway"></property>
     </bean>
 
@@ -36,11 +36,11 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData">
+    <bean id="accountDataGateway" class="is.ru.honn.rutube.accountservice.data.AccountData">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="userDataGateway" class="is.ru.honn.rutube.data.user.UserData">
+    <bean id="userDataGateway" class="is.ru.honn.rutube.userservice.data.UserData">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -51,7 +51,7 @@
         <constructor-arg name="file" value="/account"/>
     </bean>
 
-    <bean id="authenticationClient" class="is.ru.honn.rutube.client.authentication.RuTubeAuthenticationClient">
+    <bean id="authenticationClient" class="is.ru.honn.rutube.clients.authentication.RuTubeAuthenticationClient">
         <property name="serviceUrl" ref="authenticationMicroServiceUrl"/>
     </bean>
 
