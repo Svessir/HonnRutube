@@ -18,9 +18,8 @@ import is.ru.honn.rutube.domain.user.UserProfile;
  * @version 1.0, 27 okt. 2016
  */
 public interface UserDataGateway {
-    UserProfile getUserProfile(int id);
-    void modifyUserProfile(int id);
-    void deleteUserProfile(int id);
+    UserProfile getUserProfile(int userId);
+    void deleteUserProfile(int userId);
     void addFavoriteVideo(int userId, int videoId);
     void deleteFavoriteVideo(int userId, int videoId);
     void addCloseFriend(int userId, int friendId);

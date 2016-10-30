@@ -1,6 +1,7 @@
 CREATE TABLE Favorites
 (
-  userId int IDENTITY NOT NULL,
-  videoId int IDENTITY NOT NULL,
-  CONSTRAINT pk_favorites PRIMARY KEY (userId, videoId)
+  userId int NOT NULL,
+  videoId int NOT NULL,
+  PRIMARY KEY (userId, videoId),
+    CONSTRAINT fk_favorites FOREIGN KEY (userId) REFERENCES UserProfile(userId)
 )

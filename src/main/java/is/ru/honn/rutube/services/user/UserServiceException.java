@@ -7,7 +7,7 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.services;
+package is.ru.honn.rutube.services.user;
 
 /**
  * Component description

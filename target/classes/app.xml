@@ -6,8 +6,11 @@
     <bean id="accountService" class="is.ru.honn.rutube.services.account.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
     </bean>
-    <bean id="userService" class="is.ru.honn.rutube.services.RuTubeUserService">
+
+    <bean id="userService" class="is.ru.honn.rutube.services.user.RuTubeUserService">
+        <property name="userDataGateway" ref="userDataGateway"></property>
     </bean>
+
     <bean id="authenticationClient" class="is.ru.honn.rutube.client.authentication.RuTubeAuthenticationClient"></bean>
 
     <!-- Data Source -->
@@ -34,6 +37,10 @@
     </bean>
 
     <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="userDataGateway" class="is.ru.honn.rutube.data.user.UserData">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

@@ -12,17 +12,16 @@ package is.ru.honn.rutube.conrollers;
 import is.ru.honn.rutube.client.authentication.AuthenticationClient;
 import is.ru.honn.rutube.client.authentication.RuTubeAuthenticationClient;
 import is.ru.honn.rutube.client.authentication.User;
+import is.ru.honn.rutube.data.user.UserDataGatewayException;
+import is.ru.honn.rutube.domain.Video;
 import is.ru.honn.rutube.domain.user.UserProfile;
-import is.ru.honn.rutube.domain.user.UserProfileChange;
-import is.ru.honn.rutube.services.UserService;
+import is.ru.honn.rutube.services.user.UserService;
+import is.ru.honn.rutube.services.user.UserServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * RESTful user controller
@@ -50,30 +49,25 @@ public class UserController {
     @RequestMapping(value = "/profile", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity getUserProfile(@RequestHeader(name = "Token", required = false) String token){
         User user = authenticationClient.getLoggedInUser(token);
-        if(user == null){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        if(user != null){
+            userService.getUser(user.getUserId());
+            return new ResponseEntity(HttpStatus.OK);
         }
-
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
+     * Deletes a user.
      *
-     * @return
-     */
-    @RequestMapping(value = "/profile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity modifyUserProfile(){
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-    /**
-     *
-     * @param id The id of the user
+     * @param userId The id of the user being deleted.
      * @return
      */
     @RequestMapping(value = "/profile", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity deleteUser(int id){
-        if(userService.deleteUser(id)) {
+    ResponseEntity deleteUser(@RequestHeader(name = "Token", required = false) String token,
+                              @RequestBody int userId){
+        User user = authenticationClient.getLoggedInUser(token);
+        if(user != null) {
+            userService.deleteUser(userId);
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -82,26 +76,38 @@ public class UserController {
     /**
      * THe controller method for a video being added to user favorites
      *
-     * @param id The id of a video being added to favorites
+     * @param userId The id of the user.
+     * @param videoId The id of the video being added from this users favorites.
      * @return
      */
     @RequestMapping(value = "/favoriteVideo", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity addVideoToFavorites(int id){
-        if(userService.addVideoToFavorites(id)) {
+    ResponseEntity addVideoToFavorites(@RequestHeader(name = "Token", required = false) String token,
+                                       @RequestBody int userId, int videoId){
+        User user = authenticationClient.getLoggedInUser(token);
+        if(user != null) {
+            // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
+            //return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            userService.addVideoToFavorites(userId, videoId);
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
-     * The controller method for a video being removed from user favorites
+     * The controller method for a video being removed from user favorites.
      *
-     * @param id The id of a video being deleted from favorites
+     * @param userId The id of the user.
+     * @param videoId The id of the video being removed from this users favorites.
      * @return
      */
     @RequestMapping(value = "/favoriteVideo", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity deleteVideoFromFavorites(int id){
-        if(userService.deleteVideoFromFavorites(id)) {
+    ResponseEntity deleteVideoFromFavorites(@RequestHeader(name = "Token", required = false) String token,
+                                            @RequestBody int userId, int videoId){
+        User user = authenticationClient.getLoggedInUser(token);
+        if(user != null) {
+            // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
+            // return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            userService.deleteVideoFromFavorites(userId, videoId);
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -110,27 +116,45 @@ public class UserController {
     /**
      * The controller method for a user being added to close friends
      *
-     * @param id The id of a user being added to close friends
+     * @param userId The id of a user.
+     * @param friendId The id of the friend being added from this users close friends.
      * @return
      */
     @RequestMapping(value = "/closeFriends", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity addCloseFriend(int id){
-        if(userService.addUserToCloseFriends(id)) {
-            return new ResponseEntity(HttpStatus.OK);
+    ResponseEntity addCloseFriend(@RequestHeader(name = "Token", required = false) String token,
+                                  @RequestBody int userId, int friendId){
+        User user = authenticationClient.getLoggedInUser(token);
+        if(user != null) {
+            UserProfile userProfile = userService.getUser(friendId);
+            if(userProfile != null) {
+                // TODO: make userClient get the user with this friendId, if that user is null. Bad_Request
+                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                userService.addUserToCloseFriends(userId, friendId);
+                return new ResponseEntity(HttpStatus.OK);
+            }
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
-     * The controller method for a user being removed from close friends
+     * The controller method for a user being removed from close friends.
      *
-     * @param id The id of a user being removed from close friends
+     * @param userId The id of a user.
+     * @param friendId The id of the friend being removed from this users close friends.
      * @return
      */
     @RequestMapping(value = "/closeFriends", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity deleteFromCloseFriends(int id){
-        if(userService.deleteUserFromCloseFriends(id)) {
-            return new ResponseEntity(HttpStatus.OK);
+    ResponseEntity deleteFromCloseFriends(@RequestHeader(name = "Token", required = false) String token,
+                                          @RequestBody int userId, int friendId){
+        User user = authenticationClient.getLoggedInUser(token);
+        if(user != null) {
+            UserProfile userProfile = userService.getUser(friendId);
+            if(userProfile != null) {
+                // TODO: make userClient get the user with this friendId, if that user is null. Bad_Request
+                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                userService.deleteUserFromCloseFriends(userId, friendId);
+                return new ResponseEntity(HttpStatus.OK);
+            }
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
