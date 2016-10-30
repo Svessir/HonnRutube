@@ -7,34 +7,34 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.accountservice.validator;
+package is.ru.honn.rutube.videoservice.validator;
 
 /**
- * API for validatable objects.
+ * API for an object that can be validated.
  *
  * @author Sverrir
- * @version 1.0, 27 okt. 2016
- * @param <T> The object the validators can validate.
+ * @version 1.0, 30 okt. 2016
+ * @param <T>
  */
 public interface Validatable<T> {
 
     /**
      * Adds a validator to the list of validators
-     * for this object.
+     * validating this object.
      *
-     * @param validator The validator to be added.
+     * @param validator The validator being added.
      */
     void addValidator(Validator<T> validator);
 
     /**
-     * Validate according to added validators.
+     * Validates the object.
      *
-     * @return true if object is valid.
+     * @return true if object is valid else false.
      */
     boolean validate();
 
     /**
-     * initializes validators.
+     * Initializes this object with default validators if any.
      */
     void initialize();
 }

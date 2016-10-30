@@ -7,14 +7,14 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.accountservice.validator;
+package is.ru.honn.rutube.videoservice.validator;
 
 /**
- * Validator API
+ * API for a validator.
  *
  * @author Sverrir
- * @version 1.0, 26 okt. 2016
- * @param <T> The object this validator validates.
+ * @version 1.0, 30 okt. 2016
+ * @param <T> The object this validator can validate.
  */
 public interface Validator<T> {
 

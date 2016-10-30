@@ -9,7 +9,11 @@
 
 
     <bean id="userService" class="is.ru.honn.rutube.userservice.services.RuTubeUserService">
-        <property name="userDataGateway" ref="userDataGateway"></property>
+        <property name="userDataGateway" ref="userDataGateway"/>
+    </bean>
+
+    <bean id="videoService" class="is.ru.honn.rutube.videoservice.services.RuTubeVideoService">
+        <property name="videoDataGateway" ref="videoDataGateway"/>
     </bean>
 
 
@@ -41,6 +45,10 @@
     </bean>
 
     <bean id="userDataGateway" class="is.ru.honn.rutube.userservice.data.UserData">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="videoDataGateway" class="is.ru.honn.rutube.videoservice.data.VideoData">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

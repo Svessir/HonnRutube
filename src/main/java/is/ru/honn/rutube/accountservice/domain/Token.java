@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public class Token  implements Validatable {
+public class Token implements Validatable<Token> {
 
     private int userId;
     private String username;
@@ -49,8 +49,8 @@ public class Token  implements Validatable {
         this.username = account.getUsername();
         this.password = account.getPassword();
 
-        //Expires after 60 seconds;
-        this.expires = System.currentTimeMillis() + (60L * 1000L);
+        //Expires after 60 minutes;
+        this.expires = System.currentTimeMillis() + (3600L * 1000L);
     }
 
     /**

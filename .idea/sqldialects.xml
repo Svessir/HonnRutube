@@ -2,5 +2,13 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/SQL/CREATE_ACCOUNT.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_CHANNEL.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_CHANNELVIDEO.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_FAVORITES.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_FRIENDS.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_USER_PROFILE.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/CREATE_VIDEO.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/INSERT_CHANNEL.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL/INSERT_VIDEO.sql" dialect="TSQL" />
   </component>
 </project>

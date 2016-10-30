@@ -25,7 +25,7 @@ import is.ru.honn.rutube.accountservice.domain.Account;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public class AccountValidator implements Validator {
+public class AccountValidator implements Validator<Account> {
 
     private Account account;
 
