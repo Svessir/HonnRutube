@@ -6,9 +6,9 @@
     <bean id="accountService" class="is.ru.honn.rutube.services.account.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
     </bean>
+
     <bean id="userService" class="is.ru.honn.rutube.services.RuTubeUserService">
     </bean>
-    <bean id="authenticationClient" class="is.ru.honn.rutube.client.authentication.RuTubeAuthenticationClient"></bean>
 
     <!-- Data Source -->
     <bean id="dataSource"
@@ -35,6 +35,17 @@
 
     <bean id="accountDataGateway" class="is.ru.honn.rutube.data.AccountData">
         <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="authenticationMicroServiceUrl" class="java.net.URL">
+        <constructor-arg name="protocol" value="http"/>
+        <constructor-arg name="host" value="localhost"/>
+        <constructor-arg name="port" value="8080"/>
+        <constructor-arg name="file" value="/account"/>
+    </bean>
+
+    <bean id="authenticationClient" class="is.ru.honn.rutube.client.authentication.RuTubeAuthenticationClient">
+        <property name="serviceUrl" ref="authenticationMicroServiceUrl"/>
     </bean>
 
 </beans>

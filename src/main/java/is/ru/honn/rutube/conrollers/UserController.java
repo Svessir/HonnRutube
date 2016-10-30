@@ -37,10 +37,15 @@ public class UserController {
     private UserService userService;
     private AuthenticationClient authenticationClient;
 
+    /**
+     * @param userService The userService being.
+     * @param authenticationClient A client to communicate with the authentication micro service.
+     */
     @Autowired
-    public UserController(UserService userService, RuTubeAuthenticationClient authenticationClient){
+    public UserController(UserService userService, AuthenticationClient authenticationClient){
         this.userService = userService;
         this.authenticationClient = authenticationClient;
+        authenticationClient.getLoggedInUser("blah");
     }
 
     /**

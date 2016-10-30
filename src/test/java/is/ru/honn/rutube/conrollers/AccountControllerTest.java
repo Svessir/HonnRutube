@@ -204,7 +204,7 @@ public class AccountControllerTest implements ApplicationContextAware{
         // Set the current username as the updated username.
         currentUsername = "TestUser1";
 
-        // Run is_authenticated test again and verify that the updated account information do work.
+        // Run is_authenticated test again and verify that the updated account information does work.
         stage3_isAuthenticated();
     }
 
