@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URL;
 
 /**
- * Component description
+ * Client that communicates with the user micro service.
  *
  * @author Kári
  * @version 1.0, 30 okt. 2016

@@ -1,13 +1,13 @@
 /*************************************************************************************************
  *
- * UserControllerTest.java - The UserControllerTest class.
+ * UserControllerTest1.java - The UserControllerTest1 class.
  *
  * Copyright (c) 2016 Sverrir Magnússon & Kári Eiríksson. 
  * All rights reserved.
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.conrollers;
+package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
