@@ -18,10 +18,11 @@ import is.ru.honn.rutube.userservice.domain.UserProfile;
  * @version 1.0, 27 okt. 2016
  */
 public interface UserDataGateway {
+    void createUserProfile(int userId) throws UserDataGatewayException;
     UserProfile getUserProfile(int userId);
-    void deleteUserProfile(int userId);
-    void addFavoriteVideo(int userId, int videoId);
-    void deleteFavoriteVideo(int userId, int videoId);
-    void addCloseFriend(int userId, int friendId);
-    void deleteCloseFriend(int userId, int friendId);
+    void deleteUserProfile(int userId) throws UserDataGatewayException;
+    void addFavoriteVideo(int userId, int videoId) throws UserDataGatewayException;
+    void deleteFavoriteVideo(int userId, int videoId) throws UserDataGatewayException;
+    void addCloseFriend(int userId, int friendId) throws UserDataGatewayException;
+    void deleteCloseFriend(int userId, int friendId) throws UserDataGatewayException;
 }
