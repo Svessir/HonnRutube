@@ -176,6 +176,23 @@ public class VideoControllerTest  implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, channelVideoResponse.getStatusCode());
 
         assertEquals("myTitle", channelVideoResponse.getBody().get(0).getTitle());
+
+        Video myVideo = channelVideoResponse.getBody().get(0);
+
+        ResponseEntity<List<Video>> allVideosResponse = template.exchange(base.toString(),
+                HttpMethod.GET, httpEntity1, new ParameterizedTypeReference<List<Video>>() {});
+
+        // Assert the operation was successful.
+        assertEquals(HttpStatus.OK, allVideosResponse.getStatusCode());
+
+        // Confirm video is listed in all videos.
+        Video vid = null;
+        for(Video video : allVideosResponse.getBody()) {
+            if(video.getVideoId() == myVideo.getVideoId())
+                vid = video;
+        }
+        // Verify the video was found in the list.
+        assertNotNull(vid);
     }
 
     /**
