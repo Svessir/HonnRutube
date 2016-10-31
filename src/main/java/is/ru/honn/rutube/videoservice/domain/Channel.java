@@ -31,6 +31,18 @@ public class Channel implements Validatable<Channel> {
     private List<Validator> validators = new ArrayList<>();
 
     /**
+     * Default constructor.
+     */
+    public Channel() {}
+
+    /**
+     * @param channelName The name of the channel.
+     */
+    public Channel(String channelName) {
+        this.channelName = channelName;
+    }
+
+    /**
      * Adds a validator to the list of validators validating this channel.
      *
      * @param validator The validator to be added.

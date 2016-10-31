@@ -38,6 +38,21 @@ public class Video implements Validatable<Video> {
     public Video() {}
 
     /**
+     * @param title video title.
+     * @param description video description.
+     * @param url video url.
+     * @param viewCount video view count.
+     * @param numberOfLikes video number of likes.
+     */
+    public Video(String title, String description, String url, int viewCount, int numberOfLikes) {
+        this.title = title;
+        this.description = description;
+        this.url = url;
+        this.viewCount = viewCount;
+        this.numberOfLikes = numberOfLikes;
+    }
+
+    /**
      * Adds a validator to the list of validators validating this video.
      *
      * @param validator The validator to be added.
