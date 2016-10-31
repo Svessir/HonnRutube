@@ -19,7 +19,7 @@ import java.util.List;
  * @version 1.0, 26 okt. 2016
  */
 public class UserProfile {
-    protected int Id;
+    protected int userId;
     protected String username;
     protected List<Integer> favoriteVideos;
     protected List<Integer> closeFriends;
@@ -32,11 +32,10 @@ public class UserProfile {
     }
 
     /**
-     *
-     * @param id The user id
+     * @param userId The user id
      */
-    public UserProfile(int id, String username){
-        setId(id);
+    public UserProfile(int userId, String username){
+        setUserId(userId);
         setUsername(username);
         favoriteVideos = new ArrayList<Integer>();
         closeFriends = new ArrayList<Integer>();
@@ -47,17 +46,17 @@ public class UserProfile {
      *
      * @return The user id.
      */
-    public int getId() {
-        return Id;
+    public int getUserId() {
+        return userId;
     }
 
     /**
      * Set the user id.
      *
-     * @param id The user id.
+     * @param userId The user id.
      */
-    public void setId(int id) {
-        Id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     /**

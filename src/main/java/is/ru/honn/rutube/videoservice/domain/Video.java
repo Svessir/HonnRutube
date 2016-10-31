@@ -9,6 +9,7 @@
 
 package is.ru.honn.rutube.videoservice.domain;
 
+import is.ru.honn.rutube.videoservice.validator.AbstractValidatableObject;
 import is.ru.honn.rutube.videoservice.validator.Validatable;
 import is.ru.honn.rutube.videoservice.validator.Validator;
 import is.ru.honn.rutube.videoservice.validator.VideoValidator;
@@ -22,7 +23,7 @@ import java.util.List;
  * @author Sverrir
  * @version 1.0, 30 okt. 2016
  */
-public class Video implements Validatable<Video> {
+public class Video extends AbstractValidatableObject implements Validatable {
 
     private int videoId;
     private String title;
@@ -38,28 +39,18 @@ public class Video implements Validatable<Video> {
     public Video() {}
 
     /**
-     * Adds a validator to the list of validators validating this video.
-     *
-     * @param validator The validator to be added.
+     * @param title video title.
+     * @param description video description.
+     * @param url video url.
+     * @param viewCount video view count.
+     * @param numberOfLikes video number of likes.
      */
-    @Override
-    public void addValidator(Validator<Video> validator) {
-        if(validator != null)
-            validators.add(validator);
-    }
-
-    /**
-     * Validates the video.
-     *
-     * @return true if the video is valid else false.
-     */
-    @Override
-    public boolean validate() {
-        for(Validator validator : validators) {
-            if(!validator.validate())
-                return false;
-        }
-        return true;
+    public Video(String title, String description, String url, int viewCount, int numberOfLikes) {
+        this.title = title;
+        this.description = description;
+        this.url = url;
+        this.viewCount = viewCount;
+        this.numberOfLikes = numberOfLikes;
     }
 
     /**
@@ -67,6 +58,7 @@ public class Video implements Validatable<Video> {
      */
     @Override
     public void initialize() {
+        cleanValidators();
         addValidator(new VideoValidator(this));
     }
 

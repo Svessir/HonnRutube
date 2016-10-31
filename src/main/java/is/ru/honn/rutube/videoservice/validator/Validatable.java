@@ -14,9 +14,8 @@ package is.ru.honn.rutube.videoservice.validator;
  *
  * @author Sverrir
  * @version 1.0, 30 okt. 2016
- * @param <T>
  */
-public interface Validatable<T> {
+public interface Validatable {
 
     /**
      * Adds a validator to the list of validators
@@ -24,14 +23,14 @@ public interface Validatable<T> {
      *
      * @param validator The validator being added.
      */
-    void addValidator(Validator<T> validator);
+    void addValidator(Validator validator);
 
     /**
      * Validates the object.
      *
-     * @return true if object is valid else false.
+     * @throws ValidationException if object is not valid.
      */
-    boolean validate();
+    void validate() throws ValidationException;
 
     /**
      * Initializes this object with default validators if any.

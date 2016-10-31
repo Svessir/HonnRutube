@@ -21,7 +21,14 @@ public interface Validator<T> {
     /**
      * Validates the object set to this validator.
      *
-     * @return true if object is valid else false.
+     * @throws ValidationException if object is not valid.
      */
-    boolean validate();
+    void validate() throws ValidationException;
+
+    /**
+     * Sets the object to validate.
+     *
+     * @param object The object to validate.
+     */
+    void setObject(T object);
 }

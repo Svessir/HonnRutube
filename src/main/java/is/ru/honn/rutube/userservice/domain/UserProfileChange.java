@@ -29,7 +29,6 @@ public class UserProfileChange {
     }
 
     /**
-     *
      * @param newUserName The userProfileChange new username.
      * @param currentPassword The userProfileChange current password.
      * @param newPassword The userProfileChange new password.

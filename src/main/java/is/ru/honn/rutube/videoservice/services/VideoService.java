@@ -45,7 +45,7 @@ public interface VideoService {
      * @param videoId The id of the video being added to the channel.
      * @throws VideoServiceException If adding the video fails.
      */
-    void addVideoToChannel(String channelName, int videoId) throws VideoServiceException;
+    void addExistingVideoToChannel(String channelName, int videoId) throws VideoServiceException;
 
     /**
      * Removes a video from the system.
@@ -70,4 +70,22 @@ public interface VideoService {
      * @return the Channel
      */
     Channel getChannel(String channelName);
+
+
+    /**
+     * Adds a channel to RuTube.
+     *
+     * @param channel The channel being added.
+     * @throws VideoServiceException If creating a channel fails.
+     */
+    void addChannel(Channel channel) throws VideoServiceException ;
+
+    /**
+     * Adds a new video to a channel.
+     *
+     * @param channelName The name of the channel.
+     * @param video The new video.
+     * @throws VideoServiceException If adding the video fails.
+     */
+    void addNewVideoToChannel(String channelName, Video video) throws VideoServiceException;
 }

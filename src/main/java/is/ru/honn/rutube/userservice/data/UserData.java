@@ -18,6 +18,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
+import java.util.List;
+
 
 /**
  * RuTube implementation of user data gateway
@@ -53,9 +55,9 @@ public class UserData extends RuData implements UserDataGateway {
     }
 
     /**
-     * Get the logged in user.
+     * Gets the profile of user.
      *
-     * @return The userProfile logged in.
+     * @return Gets a profile for user..
      */
     @Override
     public UserProfile getUserProfile(int userId) {
@@ -65,8 +67,10 @@ public class UserData extends RuData implements UserDataGateway {
             SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
             UserProfile userProfile = (UserProfile) template.
                     queryForObject(sql, sqlParameters, new BeanPropertyRowMapper(UserProfile.class));
+            userProfile.setCloseFriends(getListOfFriendIds(userId));
+            userProfile.setFavoriteVideos(getListOfFavouriteVideoIds(userId));
             return userProfile;
-        }catch (DataAccessException daex){
+        } catch (DataAccessException daex) {
             return null;
         }
     }
@@ -166,5 +170,31 @@ public class UserData extends RuData implements UserDataGateway {
         }catch (DataAccessException dex){
             throw new UserDataGatewayException("Deletion failed.");
         }
+    }
+
+    /**
+     * Gets the list of friend ids
+     *
+     * @param userId The id of the user.
+     * @return List of friend id's
+     */
+    private List<Integer> getListOfFriendIds(int userId) {
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+        SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
+        return template.query("SELECT F.friendId FROM Friends F WHERE F.userId = :userId;",
+                sqlParameters, new IntegerRowMapper(1));
+    }
+
+    /**
+     * Gets the list of favourite video ids.
+     *
+     * @param userId The id of the user.
+     * @return list of favourite videos of user.
+     */
+    private List<Integer> getListOfFavouriteVideoIds(int userId) {
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+        SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
+        return template.query("SELECT F.videoId FROM Favorites F WHERE F.userId = :userId;",
+                sqlParameters, new IntegerRowMapper(1));
     }
 }

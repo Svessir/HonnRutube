@@ -28,19 +28,19 @@ public interface UserService {
     void createUserProfile(int userId) throws UserServiceException;
 
     /**
-     * Get a user.
+     * Get a user profile.
      *
      * @param userId The userId of the user.
      * @return The userProfile data.
      */
-    UserProfile getUser(int userId);
+    UserProfile getUserProfile(int userId);
 
     /**
-     * Deletes user
+     * Deletes user profile
      *
      * @param userId The userId of the user being deleted.
      */
-    void deleteUser(int userId) throws UserServiceException;
+    void deleteUserProfile(int userId) throws UserServiceException;
 
     /**
      * Adds a video to a users favorite list.

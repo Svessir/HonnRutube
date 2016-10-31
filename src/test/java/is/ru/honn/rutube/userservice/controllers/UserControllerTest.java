@@ -74,6 +74,7 @@ public class UserControllerTest implements ApplicationContextAware {
         dataSource = (DataSource) applicationContext.getBean("dataSource");
         authenticationClient = (AuthenticationClient) applicationContext.getBean("authenticationClient");
         userServiceClient = (UserServiceClient) applicationContext.getBean("userServiceClient");
+        videoServiceClient = (VideoServiceClient) applicationContext.getBean("videoServiceClient");
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -81,10 +82,11 @@ public class UserControllerTest implements ApplicationContextAware {
     public static void cleanDataBases(){
         JdbcTemplate template = new JdbcTemplate(dataSource);
 
-        //template.update("DELETE Favorites;");
-        //template.update("DELETE Friends;");
-        //template.update("DELETE UserProfile;");
+        template.update("DELETE Favorites;");
+        template.update("DELETE Friends;");
+        template.update("DELETE UserProfile;");
         template.update("DELETE Account;");
+        template.update("DELETE Video");
     }
 
     public static void signIn() throws Exception {
@@ -102,6 +104,15 @@ public class UserControllerTest implements ApplicationContextAware {
         httpHeaders.set("Token", token);
     }
 
+    public static void setUpDatabase(){
+        JdbcTemplate template = new JdbcTemplate(dataSource);
+
+        template.update("INSERT INTO Video VALUES ('honn16', 'fyrirlestur', 'http://myschool.com/honn16', 50, 15)");
+        template.update("INSERT INTO UserProfile VALUES (1000)");
+        template.update("INSERT INTO UserProfile VALUES (1001)");
+
+    }
+
     @Before
     public void setUp() throws Exception {
         this.base = new URL("http://localhost:" + 8080 + "/user/");
@@ -109,6 +120,7 @@ public class UserControllerTest implements ApplicationContextAware {
         if(!isSetupDone) {
             cleanDataBases();
             signIn();
+            setUpDatabase();
         }
 
         isSetupDone = true;
@@ -126,6 +138,9 @@ public class UserControllerTest implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());
 
+        response = template.getForEntity(base.toString() + "profile/", String.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("User not logged in.", response.getBody().toString());
     }
 
     /**
@@ -133,7 +148,7 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage2_deleteUserTest(){
-        int user = 1;
+        int user = 1000;
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
         ResponseEntity response = template.exchange(base.toString() + "profile/" + user,
                                                         HttpMethod.DELETE, httpEntity, String.class);
@@ -146,15 +161,15 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage3_addVideoToFavoritesTest(){
-        int video = 5;
+        int video = videoServiceClient.getAllVideos(token).get(0).getVideoId();
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         ResponseEntity response = template.postForEntity(base.toString() + "favorite/" + video,
                                                             httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        int video2 = 6;
-        response = template.postForEntity(base.toString() + "favorite/" + video2,
+        response = template.postForEntity(base.toString() + "favorite/" + video,
                 httpEntity, String.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Duplicate add.", response.getBody().toString());
     }
 
     /**
@@ -162,7 +177,7 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage4_deleteVideoFromFavoritesTest(){
-        int video = 5;
+        int video = videoServiceClient.getAllVideos(token).get(0).getVideoId();
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         ResponseEntity response = template.exchange(base.toString() + "favorite/" + video,
                                                         HttpMethod.DELETE, httpEntity, String.class);
@@ -174,15 +189,20 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage5_addCloseFriendTest(){
-        int friend = 2;
+        int friend = 1001;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         ResponseEntity response = template.postForEntity(base.toString() + "friends/" + friend,
                                                             httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        int friend2 = 3;
-        response = template.postForEntity(base.toString() + "friends/" + friend2,
+        response = template.postForEntity(base.toString() + "friends/" + friend,
                 httpEntity, String.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Duplicate add.", response.getBody().toString());
+        int notFriend = 0;
+        response = template.postForEntity(base.toString() + "friends/" + notFriend,
+                httpEntity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Friend not found", response.getBody().toString());
     }
 
     /**
@@ -190,10 +210,11 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage6_deleteCloseFriendTest(){
-        int friend = 2;
+        int friend = 1001;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
         ResponseEntity response = template.exchange(base.toString() + "friends/" + friend,
                                                         HttpMethod.DELETE, httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Friend was successfully removed from favorites.", response.getBody().toString());
     }
 }

@@ -11,10 +11,8 @@ package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.authentication.User;
-import is.ru.honn.rutube.clients.user.UserServiceClient;
 import is.ru.honn.rutube.clients.video.VideoServiceClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
-import is.ru.honn.rutube.userservice.dto.UserIdDTO;
 import is.ru.honn.rutube.userservice.services.UserService;
 import is.ru.honn.rutube.userservice.services.UserServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,13 +76,13 @@ public class UserController {
     ResponseEntity getUserProfile(@RequestHeader(name = "Token", required = false) String token){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null){
-            UserProfile userProfile = userService.getUser(user.getUserId());
-            if(userProfile != null) {
-                userProfile.setUsername(user.getUsername());
-                return new ResponseEntity<>(userProfile, HttpStatus.OK);
-            }
+                UserProfile userProfile = userService.getUserProfile(user.getUserId());
+                if(user != null) {
+                    userProfile.setUsername(user.getUsername());
+                    return new ResponseEntity<>(userProfile, HttpStatus.OK);
+                }
         }
-        return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -96,7 +94,7 @@ public class UserController {
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.DELETE)
     ResponseEntity deleteUser(@PathVariable int userId){
         try {
-            userService.deleteUser(userId);
+            userService.deleteUserProfile(userId);
         }catch (UserServiceException usex){
             return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
         }

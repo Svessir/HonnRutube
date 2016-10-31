@@ -10,10 +10,12 @@
 package is.ru.honn.rutube.clients.video;
 
 import is.ru.honn.rutube.clients.authentication.User;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * Client that communicates with the
@@ -48,6 +50,29 @@ public class RuTubeVideoServiceClient implements VideoServiceClient {
         }
         catch (Exception ex)
         {
+            return null;
+        }
+    }
+
+
+    /**
+     * Gets all videos in the video service.
+     *
+     * @param token The authentication token.
+     * @return List of all existing videos.
+     */
+    @Override
+    public List<RuTubeVideo> getAllVideos(String token) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Token", token);
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+        try{
+            ResponseEntity<List<RuTubeVideo>> response = restTemplate.exchange(serviceUrl.toString() + "/",
+                    HttpMethod.GET, httpEntity, new ParameterizedTypeReference<List<RuTubeVideo>>(){});
+            return response.getStatusCode().equals(HttpStatus.OK) ? response.getBody() : null;
+        }catch (Exception ex){
             return null;
         }
     }

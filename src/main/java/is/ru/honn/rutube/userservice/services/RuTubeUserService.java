@@ -40,23 +40,23 @@ public class RuTubeUserService implements UserService {
     }
 
     /**
-     * Get a user.
+     * Gets a user profile.
      *
      * @param userId The userId of the user.
      * @return The userProfile data.
      */
     @Override
-    public UserProfile getUser(int userId) {
+    public UserProfile getUserProfile(int userId) {
         return userDataGateway.getUserProfile(userId);
     }
 
     /**
-     * Deletes user
+     * Deletes user profile.
      *
      * @param userId The userId of the user being deleted.
      */
     @Override
-    public void deleteUser(int userId) throws UserServiceException {
+    public void deleteUserProfile(int userId) throws UserServiceException {
         try {
             userDataGateway.deleteUserProfile(userId);
         }catch (UserDataGatewayException udgx){
@@ -108,12 +108,15 @@ public class RuTubeUserService implements UserService {
             if(friendProfile != null) {
                 userDataGateway.addCloseFriend(userId, friendId);
             }
+            else {
+                throw new UserServiceException("Friend does not exist.");
+            }
         }catch (UserDataGatewayException udex){
             if(udex.getMessage() == "Duplicate add.")
             {
                 throw new UserServiceException("Duplicate add.");
             }
-            throw new UserServiceException("Friends does not exists.");
+            throw new UserServiceException("Friend does not exist.");
         }
     }
 
@@ -134,7 +137,7 @@ public class RuTubeUserService implements UserService {
     }
 
     /**
-     * Sets the userDataGteway
+     * Sets the user data gateway
      *
      * @param userDataGateway The userDataGateway
      */
