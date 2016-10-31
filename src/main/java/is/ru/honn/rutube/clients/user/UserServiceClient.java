@@ -41,7 +41,7 @@ public interface UserServiceClient {
      * @param videoId The videoId of the video.
      * @return True if successful, false otherwise.
      */
-    boolean addVideoToFavorites(int userId, int videoId);
+    boolean addVideoToFavorites(int userId, int videoId, String token);
 
     /**
      * Deletes a video from users favorite list.
@@ -50,5 +50,5 @@ public interface UserServiceClient {
      * @param videoId The videoId of the video.
      * @return True if successful, false otherwise.
      */
-    boolean deleteVideoFromFavorites(int userId, int videoId);
+    boolean deleteVideoFromFavorites(int userId, int videoId, String token);
 }

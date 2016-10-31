@@ -1,6 +1,6 @@
 /*************************************************************************************************
  *
- * UserControllerTest1.java - The UserControllerTest1 class.
+ * UserControllerTest.java - The UserControllerTest class.
  *
  * Copyright (c) 2016 Sverrir Magnússon & Kári Eiríksson. 
  * All rights reserved.
@@ -10,6 +10,7 @@
 package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
+import is.ru.honn.rutube.clients.user.UserServiceClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,7 +28,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static junit.framework.TestCase.fail;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -59,10 +59,13 @@ public class UserControllerTest implements ApplicationContextAware {
 
     private static AuthenticationClient authenticationClient;
 
+    private  static UserServiceClient userServiceClient;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         dataSource = (DataSource) applicationContext.getBean("dataSource");
         authenticationClient = (AuthenticationClient) applicationContext.getBean("authenticationClient");
+        userServiceClient = (UserServiceClient) applicationContext.getBean("userServiceClient");
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -70,9 +73,9 @@ public class UserControllerTest implements ApplicationContextAware {
     public static void cleanDataBases(){
         JdbcTemplate template = new JdbcTemplate(dataSource);
 
-        template.update("DELETE Favorites;");
-        template.update("DELETE Friends;");
-        template.update("DELETE UserProfile;");
+        //template.update("DELETE Favorites;");
+       // template.update("DELETE Friends;");
+        //template.update("DELETE UserProfile;");
     }
 
     public static void signIn() throws Exception {
@@ -96,7 +99,7 @@ public class UserControllerTest implements ApplicationContextAware {
 
         if(!isSetupDone) {
             cleanDataBases();
-            signIn();
+            //signIn();
         }
 
         isSetupDone = true;
@@ -108,12 +111,15 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage1_getUserTest(){
-        HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
+        /*HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
         ResponseEntity response = template.exchange(base.toString() + "profile",
                 HttpMethod.GET, httpEntity, String.class);
-        System.out.println(response.getStatusCode().toString());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());
+        assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());*/
+        //userServiceClient.createUserProfile(1);
+        userServiceClient.createUserProfile(2);
+        //userServiceClient.createUserProfile(3);
+        userServiceClient.deleteUserProfile(3);
     }
 
     /**
@@ -121,6 +127,7 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage2_deleteUserTest(){
+
 
     }
 

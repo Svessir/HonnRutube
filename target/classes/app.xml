@@ -80,7 +80,11 @@
 
 
     <bean id="userServiceClient" class="is.ru.honn.rutube.clients.user.RuTubeUserServiceClient">
-        <property name="userServiceUrl" ref="authenticationMicroServiceUrl"/>
+        <property name="userServiceUrl" ref="userServiceMicroServiceUrl"/>
+    </bean>
+
+    <bean id="videoServiceClient" class="is.ru.honn.rutube.clients.video.RuTubeVideoServiceClient">
+        <property name="serviceUrl" ref="videoMicroServiceUrl"/>
     </bean>
 
     <bean id="videoServiceClient" class="is.ru.honn.rutube.clients.video.RuTubeVideoServiceClient">
