@@ -27,8 +27,6 @@ import org.springframework.http.*;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
 
@@ -146,8 +144,16 @@ public class AccountControllerTest implements ApplicationContextAware{
      */
     @Test
     public void stage2_authenticate() throws Exception {
-        // Authenticate the user
+
+        // Authenticate user via wrong password.
         ResponseEntity response = template.postForEntity(base.toString() + "authenticate/",
+                new Account("TestUser", "wrongPassword3"), TokenDTO.class);
+
+        // Verify that the login was not successful.
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+        // Authenticate the user
+        response = template.postForEntity(base.toString() + "authenticate/",
                 new Account("TestUser", "password3"), TokenDTO.class);
 
         // Verify that the authentication status code is correct.

@@ -54,10 +54,14 @@ public class Video extends AbstractValidatableObject implements Validatable {
     }
 
     /**
-     * Initializes the video with it's default validators.
+     * Initializes the video with it's default validators
+     * and initializes the view count and number of likes
+     * to zero.
      */
     @Override
     public void initialize() {
+        viewCount = 0;
+        numberOfLikes = 0;
         cleanValidators();
         addValidator(new VideoValidator(this));
     }

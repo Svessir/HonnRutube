@@ -33,7 +33,8 @@ public interface Validatable {
     void validate() throws ValidationException;
 
     /**
-     * Initializes this object with default validators if any.
+     * Initializes this object with default validators if any
+     * and does any other initialization required before validating.
      */
     void initialize();
 }

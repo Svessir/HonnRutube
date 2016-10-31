@@ -79,9 +79,12 @@ public class VideoControllerTest  implements ApplicationContextAware {
         template.update("DELETE Video;");
         template.update("DELETE Channel;");
         template.update("DELETE ChannelVideo;");
-        template.update("DELETE Account");
+        template.update("DELETE Account;");
     }
 
+    /**
+     * Inserts some dummy data for testing.
+     */
     public static void insertIntoDatabase() {
         NamedParameterJdbcTemplate insert = new NamedParameterJdbcTemplate(dataSource);
 
@@ -131,11 +134,73 @@ public class VideoControllerTest  implements ApplicationContextAware {
     }
 
     /**
+     * Tests channel and video creation.
+     *
+     * @throws Exception if test fails.
+     */
+    @Test
+    public void stage1_createChannelAndVideos() throws Exception {
+        // Create channel
+        HttpEntity<Channel> httpEntity = new HttpEntity<Channel>(new Channel("myChannel"),httpHeaders);
+        ResponseEntity<String> response = template.exchange(base.toString() + "channel", HttpMethod.POST,
+                httpEntity, String.class);
+
+        // Assert that the operation was successful.
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
+        // Request for all videos for channel1.
+        HttpEntity<String> httpEntity1 = new HttpEntity<String>(httpHeaders);
+        ResponseEntity<List<Video>> channelVideoResponse = template.exchange(base.toString() + "channel/mychannel", HttpMethod.GET,
+                httpEntity1, new ParameterizedTypeReference<List<Video>>() {});
+
+        // Assert that the operation was successful.
+        assertEquals(HttpStatus.OK, channelVideoResponse.getStatusCode());
+
+        // Assert that there are no videos.
+        assertEquals(0,  channelVideoResponse.getBody().size());
+
+        // Create a video on mychannel
+        HttpEntity<Video> videoEntity = new HttpEntity<Video>(new Video("myTitle", "description",
+                "http:www.myVideoValidUrl/video.com", 0, 0), httpHeaders);
+        ResponseEntity<String> videoCreateResponse = template.exchange(base.toString() + "channel/mychannel/", HttpMethod.POST,
+                videoEntity, String.class);
+
+        // Verify the operation was a success.
+        assertEquals(HttpStatus.CREATED, videoCreateResponse.getStatusCode());
+
+        // Get videos from channel again
+        channelVideoResponse = template.exchange(base.toString() + "channel/mychannel", HttpMethod.GET,
+                httpEntity1, new ParameterizedTypeReference<List<Video>>() {});
+
+        // Verify the operation was a success.
+        assertEquals(HttpStatus.OK, channelVideoResponse.getStatusCode());
+
+        assertEquals("myTitle", channelVideoResponse.getBody().get(0).getTitle());
+
+        Video myVideo = channelVideoResponse.getBody().get(0);
+
+        ResponseEntity<List<Video>> allVideosResponse = template.exchange(base.toString(),
+                HttpMethod.GET, httpEntity1, new ParameterizedTypeReference<List<Video>>() {});
+
+        // Assert the operation was successful.
+        assertEquals(HttpStatus.OK, allVideosResponse.getStatusCode());
+
+        // Confirm video is listed in all videos.
+        Video vid = null;
+        for(Video video : allVideosResponse.getBody()) {
+            if(video.getVideoId() == myVideo.getVideoId())
+                vid = video;
+        }
+        // Verify the video was found in the list.
+        assertNotNull(vid);
+    }
+
+    /**
      * Tests if getting all videos works correctly.
      * @throws Exception if test fails.
      */
     @Test
-    public void stage1_getAllVideos() throws Exception {
+    public void stage2_getAllVideos() throws Exception {
         // Request for all videos.
         HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
         ResponseEntity<List<Video>> response = template.exchange(base.toString(), HttpMethod.GET,
@@ -145,7 +210,7 @@ public class VideoControllerTest  implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         // Verify that the response includes 5 videos.
-        assertEquals(5, response.getBody().size());
+        assertEquals(6, response.getBody().size());
 
         // Get the video to add to channel in the next stage.
         videoToAdd = response.getBody().get(0);
@@ -156,7 +221,7 @@ public class VideoControllerTest  implements ApplicationContextAware {
      * @throws Exception if test fails.
      */
     @Test
-    public void stage2_addVideoToChannel() throws Exception {
+    public void stage3_addVideoToChannel() throws Exception {
         // Make sure the previous test did not fail.
         assertNotNull(videoToAdd);
 
@@ -170,7 +235,7 @@ public class VideoControllerTest  implements ApplicationContextAware {
         assertEquals(0, channelVideoResponse.getBody().size());
 
         // add the video from the previous stage to channel1.
-        ResponseEntity response = template.exchange(base.toString() + "/channel/channel1/" + videoToAdd.getVideoId(),
+        ResponseEntity response = template.exchange(base.toString() + "channel/channel1/" + videoToAdd.getVideoId(),
                 HttpMethod.POST, httpEntity, String.class);
 
 
@@ -204,7 +269,7 @@ public class VideoControllerTest  implements ApplicationContextAware {
      * @throws Exception if test fails.
      */
     @Test
-    public void stage3_deleteVideo() throws Exception {
+    public void stage4_deleteVideo() throws Exception {
         // Make sure the previous test did not fail.
         assertNotNull(videoToAdd);
 
@@ -235,7 +300,5 @@ public class VideoControllerTest  implements ApplicationContextAware {
         // Assert the video is not listed in channel1
         assertEquals(HttpStatus.OK, response2.getStatusCode());
         assertEquals(0, response2.getBody().size());
-
-
     }
 }
