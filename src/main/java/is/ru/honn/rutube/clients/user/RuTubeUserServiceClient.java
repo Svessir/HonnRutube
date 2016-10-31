@@ -10,11 +10,10 @@
 package is.ru.honn.rutube.clients.user;
 
 
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import java.net.URL;
 
 /**
@@ -35,11 +34,8 @@ public class RuTubeUserServiceClient implements UserServiceClient {
     @Override
     public boolean createUserProfile(int userId) {
         RestTemplate template = new RestTemplate();
-        UserID id = new UserID();
-        id.setUserId(userId);
-        ResponseEntity response;
         try {
-            response = template.postForEntity(userServiceUrl.toString() + "/create/", id, String.class);
+            ResponseEntity response = template.postForEntity(userServiceUrl.toString() + "/create/" + userId, null, String.class);
             return response.getStatusCode() == HttpStatus.OK ? true : false;
         }catch (Exception ex){
             return false;
@@ -55,11 +51,15 @@ public class RuTubeUserServiceClient implements UserServiceClient {
     @Override
     public boolean deleteUserProfile(int userId) {
         RestTemplate template = new RestTemplate();
-        UserID user = new UserID();
-        user.setUserId(userId);
-        ResponseEntity response;
-        return true;
+        try{
+            ResponseEntity response = template.exchange(userServiceUrl.toString() + "/profile/" + userId,
+                                                            HttpMethod.DELETE, null, String.class);
+            return response.getStatusCode() == HttpStatus.OK ? true : false;
+        }catch (Exception ex){
+            return false;
+        }
     }
+
 
     /**
      * Adds a video from users favorite list.
@@ -69,8 +69,18 @@ public class RuTubeUserServiceClient implements UserServiceClient {
      * @return True if successful, false otherwise.
      */
     @Override
-    public boolean addVideoToFavorites(int userId, int videoId) {
-        return true;
+    public boolean addVideoToFavorites(int userId, int videoId, String token) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Token", token);
+        HttpEntity entity = new HttpEntity(httpHeaders);
+        RestTemplate template = new RestTemplate();
+        try{
+            ResponseEntity response = template.exchange(userServiceUrl.toString() + "/favoriteVideo/" + userId + "/" + videoId,
+                                                            HttpMethod.POST, entity, String.class);
+            return response.getStatusCode() == HttpStatus.OK ? true : false;
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     /**
@@ -81,8 +91,18 @@ public class RuTubeUserServiceClient implements UserServiceClient {
      * @return True if successful, false otherwise.
      */
     @Override
-    public boolean deleteVideoFromFavorites(int userId, int videoId) {
-        return true;
+    public boolean deleteVideoFromFavorites(int userId, int videoId, String token) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Token", token);
+        HttpEntity entity = new HttpEntity(httpHeaders);
+        RestTemplate template = new RestTemplate();
+        try{
+            ResponseEntity response = template.exchange(userServiceUrl.toString() + "/favoriteVideo/" + userId + "/" + videoId,
+                                                            HttpMethod.DELETE, entity, String.class);
+            return response.getStatusCode() == HttpStatus.OK ? true : false;
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     /**
@@ -94,25 +114,15 @@ public class RuTubeUserServiceClient implements UserServiceClient {
         this.userServiceUrl = userServiceUrl;
     }
 
-    private class UserID{
-        private int userId;
+    private class ID{
+        private int id;
 
-        /**
-         * Get the userId.
-         *
-         * @return The userId.
-         */
-        public int getUserId() {
-            return userId;
+        public int getId() {
+            return id;
         }
 
-        /**
-         * Sets the userId.
-         *
-         * @param userId The userId of the user.
-         */
-        public void setUserId(int userId) {
-            this.userId = userId;
+        public void setId(int id) {
+            this.id = id;
         }
     }
 }
