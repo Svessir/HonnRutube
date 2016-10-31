@@ -35,7 +35,7 @@ public class RuTubeUserService implements UserService {
         try {
             userDataGateway.createUserProfile(userId);
         } catch (Exception e) {
-            throw new UserServiceException("Adding user failed.");
+            throw new UserServiceException("Duplicate add.");
         }
     }
 
@@ -76,7 +76,7 @@ public class RuTubeUserService implements UserService {
         try {
             userDataGateway.addFavoriteVideo(userId, videoId);
         }catch (UserDataGatewayException udex){
-            throw new UserServiceException("Adding failed.");
+            throw new UserServiceException("Duplicate add.");
         }
     }
 
@@ -104,9 +104,16 @@ public class RuTubeUserService implements UserService {
     @Override
     public void addUserToCloseFriends(int userId, int friendId) throws UserServiceException {
         try {
-            userDataGateway.addCloseFriend(userId, friendId);
+            UserProfile friendProfile = userDataGateway.getUserProfile(friendId);
+            if(friendProfile != null) {
+                userDataGateway.addCloseFriend(userId, friendId);
+            }
         }catch (UserDataGatewayException udex){
-            throw new UserServiceException("Adding failed.");
+            if(udex.getMessage() == "Duplicate add.")
+            {
+                throw new UserServiceException("Duplicate add.");
+            }
+            throw new UserServiceException("Friends does not exists.");
         }
     }
 
@@ -121,7 +128,6 @@ public class RuTubeUserService implements UserService {
         try {
             userDataGateway.deleteCloseFriend(userId, friendId);
         }catch (UserDataGatewayException udex){
-
             throw new UserServiceException("Deletion failed.");
         }
 

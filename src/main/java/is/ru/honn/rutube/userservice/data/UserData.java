@@ -48,7 +48,7 @@ public class UserData extends RuData implements UserDataGateway {
                     .addValue("userId", userId);
             insert.execute(namedParameters);
         }catch (DataAccessException dex){
-            throw new UserDataGatewayException("Adding user failed.");
+            throw new UserDataGatewayException("Duplicate add.");
         }
     }
 
@@ -59,12 +59,16 @@ public class UserData extends RuData implements UserDataGateway {
      */
     @Override
     public UserProfile getUserProfile(int userId) {
-        String sql = "SELECT * FROM UserProfile WHERE userId = :userId;";
-        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
-        SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
-        UserProfile userProfile = (UserProfile) template.
-                queryForObject(sql, sqlParameters, new BeanPropertyRowMapper(UserProfile.class));
-        return userProfile;
+        try {
+            String sql = "SELECT * FROM UserProfile WHERE userId = :userId;";
+            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+            SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
+            UserProfile userProfile = (UserProfile) template.
+                    queryForObject(sql, sqlParameters, new BeanPropertyRowMapper(UserProfile.class));
+            return userProfile;
+        }catch (DataAccessException daex){
+            return null;
+        }
     }
 
     /**
@@ -100,7 +104,7 @@ public class UserData extends RuData implements UserDataGateway {
                     .addValue("videoId", videoId);
             insert.execute(namedParameters);
         }catch (DataAccessException dex){
-            throw new UserDataGatewayException("Adding failed.");
+            throw new UserDataGatewayException("Duplicate add.");
         }
     }
 
@@ -140,7 +144,7 @@ public class UserData extends RuData implements UserDataGateway {
                     .addValue("friendId", friendId);
             insert.execute(namedParameters);
         }catch (DataAccessException dex){
-            throw new UserDataGatewayException("Adding failed.");
+            throw new UserDataGatewayException("Duplicate add.");
         }
     }
 
@@ -160,7 +164,7 @@ public class UserData extends RuData implements UserDataGateway {
                     .addValue("friendId", friendId);
             template.update(sql, sqlParameters);
         }catch (DataAccessException dex){
-            throw new UserDataGatewayException("deletion failed.");
+            throw new UserDataGatewayException("Deletion failed.");
         }
     }
 }

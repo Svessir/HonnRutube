@@ -60,9 +60,9 @@ public class UserController {
         try{
             userService.createUserProfile(userId);
         } catch (UserServiceException e) {
-            return new ResponseEntity(HttpStatus.CONFLICT);
+            return new ResponseEntity<String>("User already exists.", HttpStatus.CONFLICT);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<String>("User was successfully created.", HttpStatus.OK);
     }
 
 
@@ -75,14 +75,16 @@ public class UserController {
      */
     @RequestMapping(value = "/profile", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<UserProfile> getUserProfile(@RequestHeader(name = "Token", required = false) String token){
+    ResponseEntity getUserProfile(@RequestHeader(name = "Token", required = false) String token){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null){
             UserProfile userProfile = userService.getUser(user.getUserId());
-            userProfile.setUsername(user.getUsername());
-            return new ResponseEntity<UserProfile>(userProfile, HttpStatus.OK);
+            if(userProfile != null) {
+                userProfile.setUsername(user.getUsername());
+                return new ResponseEntity<>(userProfile, HttpStatus.OK);
+            }
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -96,9 +98,9 @@ public class UserController {
         try {
             userService.deleteUser(userId);
         }catch (UserServiceException usex){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>("User has been removed from database.", HttpStatus.OK);
     }
 
     /**
@@ -107,7 +109,7 @@ public class UserController {
      * @param videoId The id of the video being added from this users favorites.
      * @return
      */
-    @RequestMapping(value = "/favoriteVideo/{videoId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/favorite/{videoId}", method = RequestMethod.POST)
     ResponseEntity addVideoToFavorites(@RequestHeader(name = "Token", required = false) String token,
                                        @PathVariable int videoId){
         User user = authenticationClient.getLoggedInUser(token);
@@ -115,16 +117,16 @@ public class UserController {
             try {
                 if(videoServiceClient.getVideo(token, videoId) != null) {
                     userService.addVideoToFavorites(user.getUserId(), videoId);
+                    return new ResponseEntity<>("Video was successfully added to favorites.", HttpStatus.OK);
                 }
                 else {
-                    return new ResponseEntity(HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>("Video not found.", HttpStatus.NOT_FOUND);
                 }
-                return new ResponseEntity(HttpStatus.OK);
             }catch (UserServiceException usex){
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Duplicate add.", HttpStatus.BAD_REQUEST);
             }
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -133,7 +135,7 @@ public class UserController {
      * @param videoId The id of the video being removed from this users favorites.
      * @return
      */
-    @RequestMapping(value = "/favoriteVideo/{videoId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/favorite/{videoId}", method = RequestMethod.DELETE)
     ResponseEntity deleteVideoFromFavorites(@RequestHeader(name = "Token", required = false) String token,
                                             @PathVariable int videoId){
         User user = authenticationClient.getLoggedInUser(token);
@@ -141,16 +143,16 @@ public class UserController {
             try {
                 if(videoServiceClient.getVideo(token, videoId) != null) {
                     userService.deleteVideoFromFavorites(user.getUserId(), videoId);
-                    return new ResponseEntity(HttpStatus.OK);
+                    return new ResponseEntity<>("Video was successfully removed from favorites.", HttpStatus.OK);
                 }
                 else{
-                    return new ResponseEntity(HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>("Video not found.", HttpStatus.NOT_FOUND);
                 }
             }catch (UserServiceException usex){
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Delete video from favorites failed.", HttpStatus.BAD_REQUEST);
             }
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -159,22 +161,22 @@ public class UserController {
      * @param friendId The id of the friend being added from this users close friends.
      * @return
      */
-    @RequestMapping(value = "/closeFriends/{friendId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.POST)
     ResponseEntity addCloseFriend(@RequestHeader(name = "Token", required = false) String token,
                                   @PathVariable int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                UserProfile userProfile = userService.getUser(friendId);
-                if (userProfile != null) {
-                    userService.addUserToCloseFriends(user.getUserId(), friendId);
-                    return new ResponseEntity(HttpStatus.OK);
-                }
+                userService.addUserToCloseFriends(user.getUserId(), friendId);
+                return new ResponseEntity<>("Friend was successfully added.", HttpStatus.OK);
             }catch (UserServiceException usex){
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                if(usex.getMessage() == "Duplicate add."){
+                    return new ResponseEntity<>("Duplicate add.",HttpStatus.BAD_REQUEST);
+                }
+                return new ResponseEntity<>("Friend not found", HttpStatus.BAD_REQUEST);
             }
        }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -183,21 +185,18 @@ public class UserController {
      * @param friendId The id of the friend being removed from this users close friends.
      * @return
      */
-    @RequestMapping(value = "/closeFriends/{friendId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.DELETE)
     ResponseEntity deleteFromCloseFriends(@RequestHeader(name = "Token", required = false) String token,
                                           @PathVariable int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                UserProfile userProfile = userService.getUser(friendId);
-                if (userProfile != null) {
-                    userService.deleteUserFromCloseFriends(user.getUserId(), friendId);
-                    return new ResponseEntity(HttpStatus.OK);
-                }
+                userService.deleteUserFromCloseFriends(user.getUserId(), friendId);
+                return new ResponseEntity<>("Friend was successfully removed from favorites.", HttpStatus.OK);
             }catch (UserServiceException usex){
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Deletion failed.", HttpStatus.BAD_REQUEST);
             }
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
     }
 }

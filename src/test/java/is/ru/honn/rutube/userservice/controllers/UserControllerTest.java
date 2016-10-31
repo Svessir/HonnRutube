@@ -148,11 +148,11 @@ public class UserControllerTest implements ApplicationContextAware {
     public void stage3_addVideoToFavoritesTest(){
         int video = 5;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-        ResponseEntity response = template.postForEntity(base.toString() + "favoriteVideo/" + video,
+        ResponseEntity response = template.postForEntity(base.toString() + "favorite/" + video,
                                                             httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         int video2 = 6;
-        response = template.postForEntity(base.toString() + "favoriteVideo/" + video2,
+        response = template.postForEntity(base.toString() + "favorite/" + video2,
                 httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -164,7 +164,7 @@ public class UserControllerTest implements ApplicationContextAware {
     public void stage4_deleteVideoFromFavoritesTest(){
         int video = 5;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-        ResponseEntity response = template.exchange(base.toString() + "favoriteVideo/" + video,
+        ResponseEntity response = template.exchange(base.toString() + "favorite/" + video,
                                                         HttpMethod.DELETE, httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -176,11 +176,11 @@ public class UserControllerTest implements ApplicationContextAware {
     public void stage5_addCloseFriendTest(){
         int friend = 2;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-        ResponseEntity response = template.postForEntity(base.toString() + "closeFriends/" + friend,
+        ResponseEntity response = template.postForEntity(base.toString() + "friends/" + friend,
                                                             httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         int friend2 = 3;
-        response = template.postForEntity(base.toString() + "closeFriends/" + friend2,
+        response = template.postForEntity(base.toString() + "friends/" + friend2,
                 httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -192,7 +192,7 @@ public class UserControllerTest implements ApplicationContextAware {
     public void stage6_deleteCloseFriendTest(){
         int friend = 2;
         HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-        ResponseEntity response = template.exchange(base.toString() + "closeFriends/" + friend,
+        ResponseEntity response = template.exchange(base.toString() + "friends/" + friend,
                                                         HttpMethod.DELETE, httpEntity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
