@@ -11,6 +11,7 @@ package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.user.UserServiceClient;
+import is.ru.honn.rutube.clients.video.VideoServiceClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +36,8 @@ import static org.junit.Assert.assertThat;
 
 import javax.sql.DataSource;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Integration test for the user controller.
@@ -51,6 +55,8 @@ public class UserControllerTest implements ApplicationContextAware {
 
     private TestRestTemplate template = new TestRestTemplate();
 
+    private static String token;
+
     private JdbcTemplate jdbcTemplate;
 
     private static boolean isSetupDone;
@@ -59,7 +65,9 @@ public class UserControllerTest implements ApplicationContextAware {
 
     private static AuthenticationClient authenticationClient;
 
-    private  static UserServiceClient userServiceClient;
+    private static UserServiceClient userServiceClient;
+
+    private static VideoServiceClient videoServiceClient;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -74,17 +82,18 @@ public class UserControllerTest implements ApplicationContextAware {
         JdbcTemplate template = new JdbcTemplate(dataSource);
 
         //template.update("DELETE Favorites;");
-       // template.update("DELETE Friends;");
+        //template.update("DELETE Friends;");
         //template.update("DELETE UserProfile;");
+        template.update("DELETE Account;");
     }
 
     public static void signIn() throws Exception {
         boolean success = authenticationClient.signUp("TestUser", "12345", "12345");
 
         if(!success)
-            throw new Exception("Singing up test user failed.");
+            throw new Exception("Signing up test user failed.");
 
-        String token = authenticationClient.logIn("TestUser", "12345");
+        token = authenticationClient.logIn("TestUser", "12345");
 
         if(token == null)
             throw new Exception("Logging into test account failed.");
@@ -99,7 +108,7 @@ public class UserControllerTest implements ApplicationContextAware {
 
         if(!isSetupDone) {
             cleanDataBases();
-            //signIn();
+            signIn();
         }
 
         isSetupDone = true;
@@ -111,15 +120,12 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage1_getUserTest(){
-        /*HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
-        ResponseEntity response = template.exchange(base.toString() + "profile",
-                HttpMethod.GET, httpEntity, String.class);
+        HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
+        ResponseEntity response = template.exchange(base.toString() + "profile/",
+                HttpMethod.GET, httpEntity, UserProfile.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());*/
-        //userServiceClient.createUserProfile(1);
-        userServiceClient.createUserProfile(2);
-        //userServiceClient.createUserProfile(3);
-        userServiceClient.deleteUserProfile(3);
+        assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());
+
     }
 
     /**
@@ -127,7 +133,11 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage2_deleteUserTest(){
-
+        int user = 1;
+        HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
+        ResponseEntity response = template.exchange(base.toString() + "profile/" + user,
+                                                        HttpMethod.DELETE, httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
 
@@ -136,7 +146,15 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage3_addVideoToFavoritesTest(){
-
+        int video = 5;
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
+        ResponseEntity response = template.postForEntity(base.toString() + "favoriteVideo/" + video,
+                                                            httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        int video2 = 6;
+        response = template.postForEntity(base.toString() + "favoriteVideo/" + video2,
+                httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     /**
@@ -144,7 +162,11 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage4_deleteVideoFromFavoritesTest(){
-
+        int video = 5;
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
+        ResponseEntity response = template.exchange(base.toString() + "favoriteVideo/" + video,
+                                                        HttpMethod.DELETE, httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     /**
@@ -152,7 +174,15 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage5_addCloseFriendTest(){
-
+        int friend = 2;
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
+        ResponseEntity response = template.postForEntity(base.toString() + "closeFriends/" + friend,
+                                                            httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        int friend2 = 3;
+        response = template.postForEntity(base.toString() + "closeFriends/" + friend2,
+                httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     /**
@@ -160,6 +190,10 @@ public class UserControllerTest implements ApplicationContextAware {
      */
     @Test
     public void stage6_deleteCloseFriendTest(){
-
+        int friend = 2;
+        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
+        ResponseEntity response = template.exchange(base.toString() + "closeFriends/" + friend,
+                                                        HttpMethod.DELETE, httpEntity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }

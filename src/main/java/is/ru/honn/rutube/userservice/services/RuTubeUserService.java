@@ -9,9 +9,11 @@
 
 package is.ru.honn.rutube.userservice.services;
 
+import is.ru.honn.rutube.clients.video.VideoServiceClient;
 import is.ru.honn.rutube.userservice.data.UserDataGateway;
 import is.ru.honn.rutube.userservice.data.UserDataGatewayException;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * RuTube user service
@@ -20,7 +22,8 @@ import is.ru.honn.rutube.userservice.domain.UserProfile;
  * @version 1.0, 27 okt. 2016
  */
 public class RuTubeUserService implements UserService {
-    UserDataGateway userDataGateway;
+    private UserDataGateway userDataGateway;
+
 
     /**
      * Creates a userProfile

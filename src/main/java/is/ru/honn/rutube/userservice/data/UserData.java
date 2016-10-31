@@ -113,7 +113,7 @@ public class UserData extends RuData implements UserDataGateway {
     @Override
     public void deleteFavoriteVideo(int userId, int videoId) throws UserDataGatewayException {
         try {
-            String sql = "DELETE * FROM Favorits WHERE userId = : userId AND videoId = :videoId;";
+            String sql = "DELETE FROM Favorites WHERE userId = :userId AND videoId = :videoId;";
             NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
             SqlParameterSource sqlParameters = new MapSqlParameterSource()
                     .addValue("userId", userId)
@@ -153,7 +153,7 @@ public class UserData extends RuData implements UserDataGateway {
     @Override
     public void deleteCloseFriend(int userId, int friendId) throws UserDataGatewayException {
         try {
-            String sql = "DELETE * FROM Friends WHERE userId = : userId AND friendId = :friendId;";
+            String sql = "DELETE FROM Friends WHERE userId = :userId AND friendId = :friendId;";
             NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
             SqlParameterSource sqlParameters = new MapSqlParameterSource()
                     .addValue("userId", userId)
