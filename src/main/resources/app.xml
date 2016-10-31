@@ -9,7 +9,11 @@
 
 
     <bean id="userService" class="is.ru.honn.rutube.userservice.services.RuTubeUserService">
-        <property name="userDataGateway" ref="userDataGateway"></property>
+        <property name="userDataGateway" ref="userDataGateway"/>
+    </bean>
+
+    <bean id="videoService" class="is.ru.honn.rutube.videoservice.services.RuTubeVideoService">
+        <property name="videoDataGateway" ref="videoDataGateway"/>
     </bean>
 
 
@@ -44,16 +48,15 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="videoDataGateway" class="is.ru.honn.rutube.videoservice.data.VideoData">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="authenticationMicroServiceUrl" class="java.net.URL">
         <constructor-arg name="protocol" value="http"/>
         <constructor-arg name="host" value="localhost"/>
         <constructor-arg name="port" value="8080"/>
         <constructor-arg name="file" value="/account"/>
-    </bean>
-
-
-    <bean id="authenticationClient" class="is.ru.honn.rutube.clients.authentication.RuTubeAuthenticationClient">
-        <property name="serviceUrl" ref="authenticationMicroServiceUrl"/>
     </bean>
 
     <bean id="userServiceMicroServiceUrl" class="java.net.URL">
@@ -63,9 +66,25 @@
         <constructor-arg name="file" value="/user"/>
     </bean>
 
+    <bean id="videoMicroServiceUrl" class="java.net.URL">
+        <constructor-arg name="protocol" value="http"/>
+        <constructor-arg name="host" value="localhost"/>
+        <constructor-arg name="port" value="8080"/>
+        <constructor-arg name="file" value="/video"/>
+    </bean>
+
+
+    <bean id="authenticationClient" class="is.ru.honn.rutube.clients.authentication.RuTubeAuthenticationClient">
+        <property name="serviceUrl" ref="authenticationMicroServiceUrl"/>
+    </bean>
+
 
     <bean id="userServiceClient" class="is.ru.honn.rutube.clients.user.RuTubeUserServiceClient">
         <property name="userServiceUrl" ref="userServiceMicroServiceUrl"/>
+    </bean>
+
+    <bean id="videoServiceClient" class="is.ru.honn.rutube.clients.video.RuTubeVideoServiceClient">
+        <property name="serviceUrl" ref="videoMicroServiceUrl"/>
     </bean>
 
 </beans>

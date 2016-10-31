@@ -22,7 +22,7 @@ import java.util.List;
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
  */
-public class Account implements Validatable{
+public class Account implements Validatable<Account> {
     private int userId;
     private String username;
     private String password;
@@ -111,7 +111,8 @@ public class Account implements Validatable{
      * @param validator A validator to validate accounts.
      */
     public void addValidator(Validator validator) {
-        validators.add(validator);
+        if(validator != null)
+            validators.add(validator);
     }
 
     /**

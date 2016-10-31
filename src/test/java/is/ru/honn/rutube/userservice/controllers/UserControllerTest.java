@@ -7,7 +7,7 @@
  *
  **************************************************************************************************/
 
-package is.ru.honn.rutube.controllers;
+package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.user.UserServiceClient;
@@ -117,9 +117,9 @@ public class UserControllerTest implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("TestUser", ((UserProfile)response.getBody()).getUsername());*/
         //userServiceClient.createUserProfile(1);
-        //userServiceClient.createUserProfile(2);
+        userServiceClient.createUserProfile(2);
         //userServiceClient.createUserProfile(3);
-        userServiceClient.deleteUserProfile(2);
+        userServiceClient.deleteUserProfile(3);
     }
 
     /**

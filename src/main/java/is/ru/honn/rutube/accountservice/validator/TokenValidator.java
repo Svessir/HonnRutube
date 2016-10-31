@@ -20,7 +20,7 @@ import is.ru.honn.rutube.accountservice.domain.Token;
  * @author Sverrir
  * @version 1.0, 27 okt. 2016
  */
-public class TokenValidator implements Validator {
+public class TokenValidator implements Validator<Token> {
 
     private Token token;
 
