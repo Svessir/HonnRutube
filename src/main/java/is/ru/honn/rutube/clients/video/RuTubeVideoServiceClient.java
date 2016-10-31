@@ -43,7 +43,7 @@ public class RuTubeVideoServiceClient implements VideoServiceClient {
         try
         {
             ResponseEntity<RuTubeVideo> response = restTemplate.exchange(serviceUrl.toString() + "/" + videoId,
-                    HttpMethod.DELETE, entity, RuTubeVideo.class);
+                    HttpMethod.GET, entity, RuTubeVideo.class);
             return response.getStatusCode().equals(HttpStatus.OK) ? response.getBody() : null;
         }
         catch (Exception ex)

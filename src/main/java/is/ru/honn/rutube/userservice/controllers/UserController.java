@@ -12,6 +12,7 @@ package is.ru.honn.rutube.userservice.controllers;
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.authentication.User;
 import is.ru.honn.rutube.clients.user.UserServiceClient;
+import is.ru.honn.rutube.clients.video.VideoServiceClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
 import is.ru.honn.rutube.userservice.dto.UserIdDTO;
 import is.ru.honn.rutube.userservice.services.UserService;
@@ -34,15 +35,17 @@ public class UserController {
 
     private UserService userService;
     private AuthenticationClient authenticationClient;
+    private VideoServiceClient videoServiceClient;
 
     /**
      * @param userService The userService being.
      * @param authenticationClient A client to communicate with the authentication micro service.
      */
     @Autowired
-    public UserController(UserService userService, AuthenticationClient authenticationClient){
+    public UserController(UserService userService, AuthenticationClient authenticationClient, VideoServiceClient videoServiceClient){
         this.userService = userService;
         this.authenticationClient = authenticationClient;
+        this.videoServiceClient = videoServiceClient;
     }
 
     /**
@@ -53,7 +56,7 @@ public class UserController {
      *          and 404 NOT FOUND if user is null.
      */
     @RequestMapping(value = "/create/{userId}", method = RequestMethod.POST)
-ResponseEntity createUserProfile(@PathVariable int userId){
+    ResponseEntity createUserProfile(@PathVariable int userId){
         try{
             userService.createUserProfile(userId);
         } catch (UserServiceException e) {
@@ -76,6 +79,7 @@ ResponseEntity createUserProfile(@PathVariable int userId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null){
             UserProfile userProfile = userService.getUser(user.getUserId());
+            userProfile.setUsername(user.getUsername());
             return new ResponseEntity<UserProfile>(userProfile, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -100,20 +104,21 @@ ResponseEntity createUserProfile(@PathVariable int userId){
     /**
      * THe controller method for a video being added to user favorites
      *
-     * @param userId The id of the user.
      * @param videoId The id of the video being added from this users favorites.
      * @return
      */
-    @RequestMapping(value = "/favoriteVideo/{userId}/{videoId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/favoriteVideo/{videoId}", method = RequestMethod.POST)
     ResponseEntity addVideoToFavorites(@RequestHeader(name = "Token", required = false) String token,
-                                       @PathVariable int userId,
                                        @PathVariable int videoId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
-                //return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                userService.addVideoToFavorites(userId, videoId);
+                if(videoServiceClient.getVideo(token, videoId) != null) {
+                    userService.addVideoToFavorites(user.getUserId(), videoId);
+                }
+                else {
+                    return new ResponseEntity(HttpStatus.NOT_FOUND);
+                }
                 return new ResponseEntity(HttpStatus.OK);
             }catch (UserServiceException usex){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -125,71 +130,68 @@ ResponseEntity createUserProfile(@PathVariable int userId){
     /**
      * The controller method for a video being removed from user favorites.
      *
-     * @param userId The id of the user.
      * @param videoId The id of the video being removed from this users favorites.
      * @return
      */
-    @RequestMapping(value = "/favoriteVideo/{userId}/{videoId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/favoriteVideo/{videoId}", method = RequestMethod.DELETE)
     ResponseEntity deleteVideoFromFavorites(@RequestHeader(name = "Token", required = false) String token,
-                                            @PathVariable int userId,
                                             @PathVariable int videoId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                // TODO: make videoClient get the video with this videoId, if that video is null. Bad_Request
-                // return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                userService.deleteVideoFromFavorites(userId, videoId);
-                return new ResponseEntity(HttpStatus.OK);
+                if(videoServiceClient.getVideo(token, videoId) != null) {
+                    userService.deleteVideoFromFavorites(user.getUserId(), videoId);
+                    return new ResponseEntity(HttpStatus.OK);
+                }
+                else{
+                    return new ResponseEntity(HttpStatus.NOT_FOUND);
+                }
             }catch (UserServiceException usex){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     /**
      * The controller method for a user being added to close friends
      *
-     * @param userId The id of a user.
      * @param friendId The id of the friend being added from this users close friends.
      * @return
      */
-    @RequestMapping(value = "/closeFriends/{userId}/{friendId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/closeFriends/{friendId}", method = RequestMethod.POST)
     ResponseEntity addCloseFriend(@RequestHeader(name = "Token", required = false) String token,
-                                  @PathVariable int userId,
                                   @PathVariable int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
                 UserProfile userProfile = userService.getUser(friendId);
                 if (userProfile != null) {
-                    userService.addUserToCloseFriends(userId, friendId);
+                    userService.addUserToCloseFriends(user.getUserId(), friendId);
                     return new ResponseEntity(HttpStatus.OK);
                 }
             }catch (UserServiceException usex){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
-        }
+       }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * The controller method for a user being removed from close friends.
      *
-     * @param userId The id of a user.
      * @param friendId The id of the friend being removed from this users close friends.
      * @return
      */
-    @RequestMapping(value = "/closeFriends/{userId}/{friendId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/closeFriends/{friendId}", method = RequestMethod.DELETE)
     ResponseEntity deleteFromCloseFriends(@RequestHeader(name = "Token", required = false) String token,
-                                          @PathVariable int userId,
                                           @PathVariable int friendId){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
                 UserProfile userProfile = userService.getUser(friendId);
                 if (userProfile != null) {
-                    userService.deleteUserFromCloseFriends(userId, friendId);
+                    userService.deleteUserFromCloseFriends(user.getUserId(), friendId);
                     return new ResponseEntity(HttpStatus.OK);
                 }
             }catch (UserServiceException usex){
