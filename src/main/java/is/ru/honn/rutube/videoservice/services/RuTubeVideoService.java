@@ -13,6 +13,7 @@ import is.ru.honn.rutube.videoservice.data.VideoDataGateway;
 import is.ru.honn.rutube.videoservice.data.VideoDataGatewayException;
 import is.ru.honn.rutube.videoservice.domain.Channel;
 import is.ru.honn.rutube.videoservice.domain.Video;
+import is.ru.honn.rutube.videoservice.validator.ValidationException;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class RuTubeVideoService implements VideoService {
      * @throws VideoServiceException If adding the video fails.
      */
     @Override
-    public void addVideoToChannel(String channelName, int videoId) throws VideoServiceException {
+    public void addExistingVideoToChannel(String channelName, int videoId) throws VideoServiceException {
         try
         {
             Channel channel = getChannel(channelName);
@@ -123,6 +124,58 @@ public class RuTubeVideoService implements VideoService {
     @Override
     public Channel getChannel(String channelName) {
         return videoDataGateway.getChannelByName(channelName);
+    }
+
+    /**
+     * Adds a channel to RuTube.
+     *
+     * @param channel The channel being added.
+     * @throws VideoServiceException If creating a channel fails.
+     */
+    @Override
+    public void addChannel(Channel channel) throws VideoServiceException {
+        try
+        {
+            channel.initialize();
+            channel.validate();
+            videoDataGateway.addChannel(channel);
+        }
+        catch (VideoDataGatewayException vdgex)
+        {
+            throw new VideoServiceException("Channel already exists.", VideoServiceErrorCode.CONFLICT);
+        }
+        catch (ValidationException vex)
+        {
+            throw new VideoServiceException(vex.getMessage(), VideoServiceErrorCode.SYNTAX);
+        }
+    }
+
+    /**
+     * Adds a new video to a channel.
+     *
+     * @param channelName The name of the channel.
+     * @param video The new video.
+     * @throws VideoServiceException If adding the video fails.
+     */
+    @Override
+    public void addNewVideoToChannel(String channelName, Video video) throws VideoServiceException {
+        try
+        {
+            Channel channel = getChannel(channelName);
+
+            if (channel == null)
+                throw new VideoServiceException("Channel doesn't exist", VideoServiceErrorCode.NOT_FOUND);
+
+            video.initialize();
+            video.validate();
+
+            video = videoDataGateway.addVideo(video);
+            videoDataGateway.addVideoToChannelRelation(video.getVideoId(), channel.getChannelId());
+        }
+        catch (ValidationException vex)
+        {
+            throw new VideoServiceException(vex.getMessage(), VideoServiceErrorCode.SYNTAX);
+        }
     }
 
 

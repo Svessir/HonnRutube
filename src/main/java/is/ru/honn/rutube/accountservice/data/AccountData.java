@@ -31,17 +31,18 @@ public class AccountData extends RuData implements AccountDataGateway {
      * Adds a new account into the system database.
      *
      * @param account The account to be added to database.
+     * @return the id of the new account.
      * @throws AccountDataGatewayException If the account could not be added to the database.
      */
     @Override
-    public void addAccount(Account account) throws AccountDataGatewayException {
+    public int addAccount(Account account) throws AccountDataGatewayException {
         try
         {
             SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
                     .withTableName("Account")
                     .usingGeneratedKeyColumns("userId");
             SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(account);
-            insert.executeAndReturnKey(namedParameters).intValue();
+            return insert.executeAndReturnKey(namedParameters).intValue();
         }
         catch (DataAccessException daex)
         {

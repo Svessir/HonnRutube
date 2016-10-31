@@ -69,4 +69,21 @@ public interface VideoDataGateway {
      * @return The channel if exists else null.
      */
     Channel getChannelByName(String channelName);
+
+
+    /**
+     * Adds a channel to the database.
+     *
+     * @param channel The channel being added.
+     * @throws VideoDataGatewayException if the video already exists.
+     */
+    void addChannel(Channel channel) throws VideoDataGatewayException;
+
+    /**
+     * Adds a video to database.
+     *
+     * @param video The video being added.
+     * @return The video that was added.
+     */
+    Video addVideo(Video video);
 }

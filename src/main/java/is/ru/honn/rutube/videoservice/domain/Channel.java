@@ -10,9 +10,7 @@
 package is.ru.honn.rutube.videoservice.domain;
 
 
-import is.ru.honn.rutube.videoservice.validator.ChannelValidator;
-import is.ru.honn.rutube.videoservice.validator.Validatable;
-import is.ru.honn.rutube.videoservice.validator.Validator;
+import is.ru.honn.rutube.videoservice.validator.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.List;
  * @author Sverrir
  * @version 1.0, 30 okt. 2016
  */
-public class Channel implements Validatable<Channel> {
+public class Channel extends AbstractValidatableObject implements Validatable {
 
     private int channelId;
     private String channelName;
@@ -43,40 +41,12 @@ public class Channel implements Validatable<Channel> {
     }
 
     /**
-     * Adds a validator to the list of validators validating this channel.
-     *
-     * @param validator The validator to be added.
-     */
-    @Override
-    public void addValidator(Validator<Channel> validator) {
-        if(validator != null)
-            validators.add(validator);
-    }
-
-    /**
-     * Validate this channel information.
-     *
-     * @return true if channel information is valid else false.
-     */
-    @Override
-    public boolean validate() {
-        return false;
-    }
-
-    /**
      * Initializes this channel with it's default validators.
      */
     @Override
     public void initialize() {
         cleanValidators();
         addValidator(new ChannelValidator(this));
-    }
-
-    /**
-     * Cleans the list of validators.
-     */
-    private void cleanValidators() {
-        validators.clear();
     }
 
     /**

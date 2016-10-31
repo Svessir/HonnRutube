@@ -24,9 +24,10 @@ public interface AccountDataGateway extends RuDataAccess {
      * Adds a new account into the system database.
      *
      * @param account The account to be added to database.
+     * @return the id of the new account.
      * @throws AccountDataGatewayException If the account could not be added to the database.
      */
-    void addAccount(Account account) throws AccountDataGatewayException;
+    int addAccount(Account account) throws AccountDataGatewayException;
 
     /**
      * Gets an account from the system database.

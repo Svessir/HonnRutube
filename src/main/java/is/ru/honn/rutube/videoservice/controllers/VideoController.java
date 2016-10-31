@@ -11,6 +11,7 @@ package is.ru.honn.rutube.videoservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.authentication.User;
+import is.ru.honn.rutube.videoservice.domain.Channel;
 import is.ru.honn.rutube.videoservice.domain.Video;
 import is.ru.honn.rutube.videoservice.services.VideoService;
 import is.ru.honn.rutube.videoservice.services.VideoServiceException;
@@ -51,7 +52,7 @@ public class VideoController {
      * @param token The authentication token.
      * @return A list of all Videos on RuTube.
      */
-    @RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity getAllVideos(@RequestHeader(name = "Token", required = false) String token) {
         User user = authenticationClient.getLoggedInUser(token);
 
@@ -110,7 +111,7 @@ public class VideoController {
 
         try
         {
-            videoService.addVideoToChannel(channelName, videoId);
+            videoService.addExistingVideoToChannel(channelName, videoId);
             return new ResponseEntity<>("Video successfully added.", HttpStatus.CREATED);
         }
         catch (VideoServiceException vsex)
@@ -134,7 +135,7 @@ public class VideoController {
      */
     @RequestMapping(value = "/{videoId}", method = RequestMethod.DELETE)
     ResponseEntity removeVideo(@RequestHeader(name = "Token", required = false) String token,
-                                          @PathVariable int videoId) {
+                               @PathVariable int videoId) {
         if(authenticationClient.getLoggedInUser(token) == null)
             return new ResponseEntity<>("You are not authorized.", HttpStatus.UNAUTHORIZED);
 
@@ -153,6 +154,72 @@ public class VideoController {
             }
         }
     }
+
+    /**
+     * Adds a channel to RuTube.
+     *
+     * @param token The authentication token.
+     * @param channel The channel being added.
+     * @return 201 CREATED if successful, 401 UNAUTHORIZED if user is not authenticated,
+     *         409 CONFLICT if the channel already exists else 400 BAD REQUEST.
+     */
+    @RequestMapping(value = "/channel", method = RequestMethod.POST)
+    ResponseEntity addChannel(@RequestHeader(name = "Token", required = false) String token,
+                              @RequestBody Channel channel) {
+        if(authenticationClient.getLoggedInUser(token) == null)
+            return new ResponseEntity("You are not authorized.", HttpStatus.UNAUTHORIZED);
+
+        try
+        {
+            videoService.addChannel(channel);
+            return new ResponseEntity<>("Channel " + channel.getChannelName() +
+                    " successfully created", HttpStatus.CREATED);
+        }
+        catch (VideoServiceException vsex)
+        {
+            switch (vsex.getErrorCode())
+            {
+                case CONFLICT:
+                    return new ResponseEntity<>(vsex.getMessage(), HttpStatus.CONFLICT);
+                default:
+                    return new ResponseEntity<>(vsex.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    /**
+     * Adds a new video to channel.
+     *
+     * @param token The authentication token.
+     * @param channelName The name of the channel.
+     * @param video The video being added.
+     * @return 201 CREATED if successful, 401 UNAUTHORIZED if user is not authenticated,
+     *         409 CONFLICT if video is already added to channel else 400 BAD REQUEST.
+     */
+    @RequestMapping(value = "/channel/{channelName}", method = RequestMethod.POST)
+    ResponseEntity addVideoToChannel(@RequestHeader(name = "Token", required = false) String token,
+                                     @PathVariable String channelName,
+                                     @RequestBody Video video) {
+        if(authenticationClient.getLoggedInUser(token) == null)
+            return new ResponseEntity<>("You are not authorized.", HttpStatus.UNAUTHORIZED);
+        try
+        {
+            videoService.addNewVideoToChannel(channelName, video);
+            return new ResponseEntity<>("Video successfully added to channel " + channelName + ".", HttpStatus.CREATED);
+        }
+        catch (VideoServiceException vsex)
+        {
+            switch (vsex.getErrorCode())
+            {
+                case NOT_FOUND:
+                    return new ResponseEntity<>("Channel " + channelName + " doesn't exist", HttpStatus.NOT_FOUND);
+                default:
+                    return new ResponseEntity<>(vsex.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+
 
     /**
      * Get a single video.

@@ -13,6 +13,10 @@ import is.ru.honn.rutube.videoservice.domain.Channel;
 
 /**
  * Validator that validates video channels.
+ * Channel is valid if:
+ * - channel name is not null.
+ * - channel name is 4 or more letters,
+ * - channel name is no more than 32 letters
  *
  * @author Sverrir
  * @version 1.0, 30 okt. 2016
@@ -31,10 +35,28 @@ public class ChannelValidator implements Validator<Channel> {
     /**
      * Validates the channel set to this validator.
      *
-     * @return true if the channel is valid else false.
+     * @throws ValidationException if channel is not valid.
      */
     @Override
-    public boolean validate() {
-        return true;
+    public void validate() throws ValidationException {
+        if(channel == null)
+            throw new ValidationException("No channel provided");
+
+        String channelName = channel.getChannelName();
+
+        if(channelName == null || channelName.length() < 4)
+            throw new ValidationException("channelName is to short: minimum length 4");
+        if(channelName.length() > 32)
+            throw new ValidationException("channelName is to long: maximum length 100");
+    }
+
+    /**
+     * Sets the channel to validate.
+     *
+     * @param object The channel to validate.
+     */
+    @Override
+    public void setObject(Channel object) {
+        channel = object;
     }
 }

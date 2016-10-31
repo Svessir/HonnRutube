@@ -5,6 +5,7 @@
 
     <bean id="accountService" class="is.ru.honn.rutube.accountservice.services.RuTubeAccountService">
         <property name="accountDataGateway" ref="accountDataGateway"/>
+        <property name="userServiceClient" ref="userServiceClient"/>
     </bean>
 
 
@@ -81,10 +82,6 @@
 
     <bean id="userServiceClient" class="is.ru.honn.rutube.clients.user.RuTubeUserServiceClient">
         <property name="userServiceUrl" ref="userServiceMicroServiceUrl"/>
-    </bean>
-
-    <bean id="videoServiceClient" class="is.ru.honn.rutube.clients.video.RuTubeVideoServiceClient">
-        <property name="serviceUrl" ref="videoMicroServiceUrl"/>
     </bean>
 
     <bean id="videoServiceClient" class="is.ru.honn.rutube.clients.video.RuTubeVideoServiceClient">

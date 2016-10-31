@@ -14,6 +14,7 @@ import is.ru.honn.rutube.accountservice.data.AccountDataGatewayException;
 import is.ru.honn.rutube.accountservice.domain.Account;
 import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
 import is.ru.honn.rutube.accountservice.domain.Token;
+import is.ru.honn.rutube.clients.user.UserServiceClient;
 
 /**
  * RuTube account service.
@@ -24,6 +25,7 @@ import is.ru.honn.rutube.accountservice.domain.Token;
 public class RuTubeAccountService implements AccountService {
 
     private AccountDataGateway accountDataGateway;
+    private UserServiceClient userServiceClient;
 
     /**
      * Default constructor.
@@ -44,7 +46,8 @@ public class RuTubeAccountService implements AccountService {
             if(!accountRegistration.validate())
                 throw new AccountServiceException("Account registration is invalid.", AccountServiceErrorCode.SYNTAX_ERROR);
 
-            accountDataGateway.addAccount(accountRegistration);
+            int userId = accountDataGateway.addAccount(accountRegistration);
+            userServiceClient.createUserProfile(userId);
         }
         catch (AccountDataGatewayException adge)
         {
@@ -137,5 +140,14 @@ public class RuTubeAccountService implements AccountService {
      */
     public void setAccountDataGateway(AccountDataGateway accountDataGateway) {
         this.accountDataGateway = accountDataGateway;
+    }
+
+    /**
+     * Sets the user service client used by this service.
+     *
+     * @param userServiceClient The user service client.
+     */
+    public void setUserServiceClient(UserServiceClient userServiceClient) {
+        this.userServiceClient = userServiceClient;
     }
 }

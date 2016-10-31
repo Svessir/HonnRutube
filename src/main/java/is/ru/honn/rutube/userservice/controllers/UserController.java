@@ -11,10 +11,8 @@ package is.ru.honn.rutube.userservice.controllers;
 
 import is.ru.honn.rutube.clients.authentication.AuthenticationClient;
 import is.ru.honn.rutube.clients.authentication.User;
-import is.ru.honn.rutube.clients.user.UserServiceClient;
 import is.ru.honn.rutube.clients.video.VideoServiceClient;
 import is.ru.honn.rutube.userservice.domain.UserProfile;
-import is.ru.honn.rutube.userservice.dto.UserIdDTO;
 import is.ru.honn.rutube.userservice.services.UserService;
 import is.ru.honn.rutube.userservice.services.UserServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +76,7 @@ public class UserController {
     ResponseEntity<UserProfile> getUserProfile(@RequestHeader(name = "Token", required = false) String token){
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null){
-            UserProfile userProfile = userService.getUser(user.getUserId());
+            UserProfile userProfile = userService.getUserProfile(user.getUserId());
             userProfile.setUsername(user.getUsername());
             return new ResponseEntity<UserProfile>(userProfile, HttpStatus.OK);
         }
@@ -94,7 +92,7 @@ public class UserController {
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.DELETE)
     ResponseEntity deleteUser(@PathVariable int userId){
         try {
-            userService.deleteUser(userId);
+            userService.deleteUserProfile(userId);
         }catch (UserServiceException usex){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -165,7 +163,7 @@ public class UserController {
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                UserProfile userProfile = userService.getUser(friendId);
+                UserProfile userProfile = userService.getUserProfile(friendId);
                 if (userProfile != null) {
                     userService.addUserToCloseFriends(user.getUserId(), friendId);
                     return new ResponseEntity(HttpStatus.OK);
@@ -189,7 +187,7 @@ public class UserController {
         User user = authenticationClient.getLoggedInUser(token);
         if(user != null) {
             try {
-                UserProfile userProfile = userService.getUser(friendId);
+                UserProfile userProfile = userService.getUserProfile(friendId);
                 if (userProfile != null) {
                     userService.deleteUserFromCloseFriends(user.getUserId(), friendId);
                     return new ResponseEntity(HttpStatus.OK);

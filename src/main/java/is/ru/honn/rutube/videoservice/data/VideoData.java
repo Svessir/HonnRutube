@@ -16,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -140,5 +141,43 @@ public class VideoData extends RuData implements VideoDataGateway {
         {
             return null;
         }
+    }
+
+    /**
+     * Adds a channel to the database.
+     *
+     * @param channel The channel being added.
+     * @throws VideoDataGatewayException if the video already exists.
+     */
+    @Override
+    public void addChannel(Channel channel) throws VideoDataGatewayException {
+        try
+        {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
+                    .withTableName("Channel")
+                    .usingColumns("channelName")
+                    .usingGeneratedKeyColumns("channelId");
+            insert.execute(new BeanPropertySqlParameterSource(channel));
+        }
+        catch (DataAccessException daex)
+        {
+            throw new VideoDataGatewayException("Channel already exists");
+        }
+    }
+
+    /**
+     * Adds a video to database.
+     *
+     * @param video The video being added.
+     * @return The video that was added.
+     */
+    @Override
+    public Video addVideo(Video video) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(getDataSource())
+                .withTableName("Video")
+                .usingGeneratedKeyColumns("videoId");
+        int id = insert.executeAndReturnKey(new BeanPropertySqlParameterSource(video)).intValue();
+        video.setVideoId(id);
+        return video;
     }
 }
