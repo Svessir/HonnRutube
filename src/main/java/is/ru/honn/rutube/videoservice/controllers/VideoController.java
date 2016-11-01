@@ -158,16 +158,12 @@ public class VideoController {
     /**
      * Adds a channel to RuTube.
      *
-     * @param token The authentication token.
      * @param channel The channel being added.
      * @return 201 CREATED if successful, 401 UNAUTHORIZED if user is not authenticated,
      *         409 CONFLICT if the channel already exists else 400 BAD REQUEST.
      */
     @RequestMapping(value = "/channel", method = RequestMethod.POST)
-    ResponseEntity addChannel(@RequestHeader(name = "Token", required = false) String token,
-                              @RequestBody Channel channel) {
-        if(authenticationClient.getLoggedInUser(token) == null)
-            return new ResponseEntity("You are not authorized.", HttpStatus.UNAUTHORIZED);
+    ResponseEntity addChannel(@RequestBody Channel channel) {
 
         try
         {
