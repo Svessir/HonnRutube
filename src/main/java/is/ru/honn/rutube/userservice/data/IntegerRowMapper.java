@@ -32,8 +32,8 @@ public class IntegerRowMapper implements RowMapper<Integer> {
     }
 
     /**
-     * @param resultSet The result set
-     * @param i The row number
+     * @param resultSet The result set.
+     * @param i The row number.
      * @return an integer.
      * @throws SQLException on failure.
      */

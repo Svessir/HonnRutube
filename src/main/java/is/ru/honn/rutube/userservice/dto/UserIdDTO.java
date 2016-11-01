@@ -10,7 +10,7 @@
 package is.ru.honn.rutube.userservice.dto;
 
 /**
- * Data transfer object for user
+ * Data transfer object for user.
  *
  * @author Kári
  * @version 1.0, 30 okt. 2016
