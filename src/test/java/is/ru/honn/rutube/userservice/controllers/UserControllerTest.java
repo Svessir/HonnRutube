@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
@@ -28,16 +27,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import javax.sql.DataSource;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Integration test for the user controller.
