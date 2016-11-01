@@ -11,6 +11,7 @@ package is.ru.honn.rutube.accountservice.services;
 
 import is.ru.honn.rutube.accountservice.domain.Account;
 import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
+import is.ru.honn.rutube.accountservice.domain.AccountUpdateForm;
 import is.ru.honn.rutube.accountservice.domain.Token;
 
 /**
@@ -32,12 +33,12 @@ public interface AccountService {
     /**
      * Updates account data.
      *
-     * @param userId The id of the user being updated.
+     * @param username The username of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
      * @return The new token for the user.
      * @throws AccountServiceException If update fails.
      */
-    Token updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException;
+    Token updateAccountData(String username, AccountUpdateForm updatedAccountRegistration) throws AccountServiceException;
 
     /**
      * Login to account.

@@ -11,6 +11,7 @@ package is.ru.honn.rutube.accountservice.controllers;
 
 import is.ru.honn.rutube.accountservice.domain.Account;
 import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
+import is.ru.honn.rutube.accountservice.domain.AccountUpdateForm;
 import is.ru.honn.rutube.accountservice.domain.Token;
 import is.ru.honn.rutube.accountservice.dto.PartialAccountDTO;
 import is.ru.honn.rutube.accountservice.dto.TokenDTO;
@@ -85,12 +86,12 @@ public class AccountController {
     /**
      * The controller method that handles updating account information.
      *
-     * @param accountRegistration The updated account information.
+     * @param accountUpdateForm The updated account information.
      * @return 200 OK if update succeeded, 401 UNAUTHORIZED if authorization is wanting
      *         else if update fails then 400 BAD REQUEST .
      */
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    ResponseEntity update(@RequestBody AccountRegistration accountRegistration,
+    ResponseEntity update(@RequestBody AccountUpdateForm accountUpdateForm,
                           @RequestHeader(name = "Token", required = false) String token) {
         Token authenticationToken;
         if((authenticationToken = accountService.isValidAccountToken(token)) == null)
@@ -98,7 +99,7 @@ public class AccountController {
 
         try
         {
-            authenticationToken = accountService.updateAccountData(authenticationToken.getUserId(),accountRegistration);
+            authenticationToken = accountService.updateAccountData(authenticationToken.getUsername(),accountUpdateForm);
             return new ResponseEntity<TokenDTO>(new TokenDTO(authenticationToken.encode()), HttpStatus.OK);
         }
         catch (AccountServiceException asex)
@@ -106,6 +107,8 @@ public class AccountController {
             switch (asex.getErrorCode()) {
                 case DUPLICATE_ADD:
                     return new ResponseEntity<String>(asex.getMessage(), HttpStatus.CONFLICT);
+                case FORBIDDEN:
+                    return new ResponseEntity<String>(asex.getMessage(), HttpStatus.FORBIDDEN);
                 default:
                     return new ResponseEntity<String>(asex.getMessage(), HttpStatus.BAD_REQUEST);
             }

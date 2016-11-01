@@ -13,7 +13,10 @@ import is.ru.honn.rutube.accountservice.data.AccountDataGateway;
 import is.ru.honn.rutube.accountservice.data.AccountDataGatewayException;
 import is.ru.honn.rutube.accountservice.domain.Account;
 import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
+import is.ru.honn.rutube.accountservice.domain.AccountUpdateForm;
 import is.ru.honn.rutube.accountservice.domain.Token;
+import is.ru.honn.rutube.accountservice.validator.AccountUpdateFormValidator;
+import is.ru.honn.rutube.accountservice.validator.Validator;
 import is.ru.honn.rutube.clients.user.UserServiceClient;
 
 /**
@@ -58,22 +61,34 @@ public class RuTubeAccountService implements AccountService {
     /**
      * Updates account data.
      *
-     * @param userId The id of the user being updated.
+     * @param username The username of the user being updated.
      * @param updatedAccountRegistration The updated account registration information.
      * @return The new token for the user.
      * @throws AccountServiceException If update fails.
      */
     @Override
-    public Token updateAccountData(int userId, AccountRegistration updatedAccountRegistration) throws AccountServiceException {
+    public Token updateAccountData(String username, AccountUpdateForm updatedAccountRegistration) throws AccountServiceException {
         try
         {
-            updatedAccountRegistration.initialize();
-            if(!updatedAccountRegistration.validate())
+            Account account = accountDataGateway.getAccountByUsername(username);
+
+            if(updatedAccountRegistration.getPassword() != null &&
+                    !account.getPassword().equals(updatedAccountRegistration.getCurrentPassword()))
+                throw new AccountServiceException("You need to provide your current password to " +
+                        "change your password. Current password is not correct", AccountServiceErrorCode.FORBIDDEN);
+
+            Validator validator = new AccountUpdateFormValidator(updatedAccountRegistration);
+            if(!validator.validate())
                 throw new AccountServiceException("Updated account information is invalid. Update aborted.",
                         AccountServiceErrorCode.SYNTAX_ERROR);
 
-            Account account = accountDataGateway.updateAccount(userId, updatedAccountRegistration);
-            return new Token(account);
+            if(updatedAccountRegistration.getUsername() != null)
+                account.setUsername(updatedAccountRegistration.getUsername());
+            if(updatedAccountRegistration.getPassword() != null)
+                account.setPassword(updatedAccountRegistration.getPassword());
+
+            Account updatedAccount = accountDataGateway.updateAccount(account.getUserId(), account);
+            return new Token(updatedAccount);
         }
         catch (AccountDataGatewayException adge)
         {

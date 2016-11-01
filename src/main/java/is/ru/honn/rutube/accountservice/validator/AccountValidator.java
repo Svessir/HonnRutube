@@ -13,14 +13,9 @@ import is.ru.honn.rutube.accountservice.domain.Account;
 
 /**
  * Account validator. Used to validate accounts.
- * Account information is valid if:
- *  - Username length is lesser than 32.
- *  - Username length is greater than 4.
- *  - Username starts with a letter.
- *  - Password length is lesser than 32.
- *  - Password length is greater than 4
- *  - Password includes a number.
- *  - Neither password nor username include a "."
+ * Is valid if username is valid according to the
+ * rules of {@link UsernameValidator} and the password
+ * is valid according to the rules of {@link PasswordValidator}
  *
  * @author Sverrir
  * @version 1.0, 26 okt. 2016
@@ -43,30 +38,8 @@ public class AccountValidator implements Validator<Account> {
      */
     @Override
     public boolean validate() {
-        String username = account.getUsername();
-        String password = account.getPassword();
-
-        if(username == null || password == null ||
-                username.length() <= 0 || password.length() <= 0 ||
-                username.length() > 32 || password.length() > 32 ||
-                Character.isDigit(username.charAt(0)) ||
-                username.contains(".") || password.contains(".") ||
-                !containsNumber(password))
-            return false;
-        return true;
-    }
-
-    /**
-     * Checks if a String field contains a number.
-     *
-     * @param field The String field being checked.
-     * @return true if field contains a number else false.
-     */
-    protected boolean containsNumber(String field) {
-        for(int i = 0; i < field.length(); i++) {
-            if(Character.isDigit(field.charAt(i)))
-                return true;
-        }
-        return false;
+        UsernameValidator usernameValidator = new UsernameValidator(account.getUsername());
+        PasswordValidator passwordValidator = new PasswordValidator(account.getPassword());
+        return usernameValidator.validate() && passwordValidator.validate();
     }
 }

@@ -12,6 +12,7 @@ package is.ru.honn.rutube.accountservice.controllers;
 import java.net.URL;
 import is.ru.honn.rutube.accountservice.domain.Account;
 import is.ru.honn.rutube.accountservice.domain.AccountRegistration;
+import is.ru.honn.rutube.accountservice.domain.AccountUpdateForm;
 import is.ru.honn.rutube.accountservice.dto.PartialAccountDTO;
 import is.ru.honn.rutube.accountservice.dto.TokenDTO;
 import org.junit.*;
@@ -196,8 +197,10 @@ public class AccountControllerTest implements ApplicationContextAware{
     @Test
     public void stage4_update() throws Exception {
         // fill up an update form and pass in the authentication token to http headers of the request.
+        AccountUpdateForm accountUpdateForm = new AccountUpdateForm();
+        accountUpdateForm.setUsername("TestUser1");
         HttpEntity<AccountRegistration> httpEntity =
-                new HttpEntity<AccountRegistration>(new AccountRegistration("TestUser1", "password3", "password3"), httpHeaders);
+                new HttpEntity<AccountRegistration>(accountUpdateForm, httpHeaders);
 
         // Send an update request to the server to update the user information.
         ResponseEntity response = template.exchange(base.toString() + "update/", HttpMethod.PUT,
