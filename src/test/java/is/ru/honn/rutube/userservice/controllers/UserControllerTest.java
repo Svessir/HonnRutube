@@ -168,7 +168,7 @@ public class UserControllerTest implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         response = template.postForEntity(base.toString() + "favorite/" + video,
                 httpEntity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("Duplicate add.", response.getBody().toString());
     }
 
@@ -196,12 +196,12 @@ public class UserControllerTest implements ApplicationContextAware {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         response = template.postForEntity(base.toString() + "friends/" + friend,
                 httpEntity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("Duplicate add.", response.getBody().toString());
         int notFriend = 0;
         response = template.postForEntity(base.toString() + "friends/" + notFriend,
                 httpEntity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Friend not found", response.getBody().toString());
     }
 

@@ -25,14 +25,14 @@ public class UserProfile {
     protected List<Integer> closeFriends;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public UserProfile(){
 
     }
 
     /**
-     * @param userId The user id
+     * @param userId The user id.
      */
     public UserProfile(int userId, String username){
         setUserId(userId);
@@ -42,7 +42,7 @@ public class UserProfile {
     }
 
     /**
-     * Get the user id
+     * Get the user id.
      *
      * @return The user id.
      */
@@ -60,7 +60,7 @@ public class UserProfile {
     }
 
     /**
-     * Get the username .
+     * Get the username.
      *
      * @return The username of the userProfile.
      */

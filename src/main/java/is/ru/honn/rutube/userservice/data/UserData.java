@@ -22,7 +22,7 @@ import java.util.List;
 
 
 /**
- * RuTube implementation of user data gateway
+ * RuTube implementation of user data gateway.
  *
  * @author Kári
  * @version 1.0, 27 okt. 2016
@@ -40,6 +40,7 @@ public class UserData extends RuData implements UserDataGateway {
      * Adds a userProfile to database.
      *
      * @param userId The userId of the user.
+     * @throws UserDataGatewayException If the user could not be added to the database.
      */
     @Override
     public void createUserProfile(int userId) throws UserDataGatewayException {
@@ -57,7 +58,8 @@ public class UserData extends RuData implements UserDataGateway {
     /**
      * Gets the profile of user.
      *
-     * @return Gets a profile for user..
+     * @return Gets a profile for user.
+     * @throws UserDataGatewayException If the user could not be found in the database.
      */
     @Override
     public UserProfile getUserProfile(int userId) {
@@ -78,11 +80,13 @@ public class UserData extends RuData implements UserDataGateway {
     /**
      * Deletes user.
      *
-     * @param userId The id of a userProfile
+     * @param userId The id of a userProfile.
+     * @throws UserDataGatewayException If the user could not be removed from the database.
      */
     @Override
     public void deleteUserProfile(int userId) throws UserDataGatewayException {
         try {
+            deleteFromFriends(userId);
             String sql = "DELETE FROM UserProfile WHERE userId = :userId;";
             NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
             SqlParameterSource sqlParameters = new MapSqlParameterSource("userId", userId);
@@ -93,10 +97,29 @@ public class UserData extends RuData implements UserDataGateway {
     }
 
     /**
+     * Removes all entries in with user as friend.
+     *
+     * @param friendId The id of the user.
+     * @throws UserDataGatewayException If the user entry could not be removed from the database.
+     */
+    @Override
+    public void deleteFromFriends(int friendId) throws UserDataGatewayException {
+        try {
+            String sql = "DELETE FROM Friends WHERE friendId = :friendId;";
+            NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());
+            SqlParameterSource sqlParameters = new MapSqlParameterSource("friendId", friendId);
+            template.update(sql, sqlParameters);
+        }catch (DataAccessException dex){
+            throw new UserDataGatewayException("Deletion failed.");
+        }
+    }
+
+    /**
      * Adds a favorite video to a user.
      *
-     * @param userId The id of a video
-     * @param videoId The id of a video
+     * @param userId The id of a video.
+     * @param videoId The id of a video.
+     * @throws UserDataGatewayException If the user entry could not be added to the database.
      */
     @Override
     public void addFavoriteVideo(int userId, int videoId) throws UserDataGatewayException {
@@ -115,8 +138,9 @@ public class UserData extends RuData implements UserDataGateway {
     /**
      * Deletes a favorite video from a user.
      *
-     * @param userId The id of a video
-     * @param videoId The id of a video
+     * @param userId The id of a video.
+     * @param videoId The id of a video.
+     * @throws UserDataGatewayException If the user entry could not be removed from the database.
      */
     @Override
     public void deleteFavoriteVideo(int userId, int videoId) throws UserDataGatewayException {
@@ -135,8 +159,9 @@ public class UserData extends RuData implements UserDataGateway {
     /**
      * Adds a close friend to a user.
      *
-     * @param userId The id of a video
-     * @param friendId The id of a userProfile
+     * @param userId The id of a video.
+     * @param friendId The id of a userProfile.
+     * @throws UserDataGatewayException If the user entry could not be added to the database.
      */
     @Override
     public void addCloseFriend(int userId, int friendId) throws UserDataGatewayException {
@@ -155,8 +180,9 @@ public class UserData extends RuData implements UserDataGateway {
     /**
      * Deletes a close friend from a user.
      *
-     * @param userId The id of a video
-     * @param friendId The id of a userProfile
+     * @param userId The id of a video.
+     * @param friendId The id of a userProfile.
+     * @throws UserDataGatewayException If the user entry could not be removed to the database.
      */
     @Override
     public void deleteCloseFriend(int userId, int friendId) throws UserDataGatewayException {
@@ -173,10 +199,10 @@ public class UserData extends RuData implements UserDataGateway {
     }
 
     /**
-     * Gets the list of friend ids
+     * Gets the list of friend ids,
      *
      * @param userId The id of the user.
-     * @return List of friend id's
+     * @return List of friend id's.
      */
     private List<Integer> getListOfFriendIds(int userId) {
         NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getDataSource());

@@ -22,7 +22,7 @@ public class UserProfileChange {
     private String repeatedPassword;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public UserProfileChange(){
 
@@ -32,7 +32,7 @@ public class UserProfileChange {
      * @param newUserName The userProfileChange new username.
      * @param currentPassword The userProfileChange current password.
      * @param newPassword The userProfileChange new password.
-     * @param repeatedPassword The userProfileChange repeated password
+     * @param repeatedPassword The userProfileChange repeated password.
      */
     public UserProfileChange(String newUserName, String currentPassword,
                              String newPassword, String repeatedPassword){

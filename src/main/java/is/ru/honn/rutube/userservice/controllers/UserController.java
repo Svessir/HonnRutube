@@ -57,10 +57,13 @@ public class UserController {
     ResponseEntity createUserProfile(@PathVariable int userId){
         try{
             userService.createUserProfile(userId);
-        } catch (UserServiceException e) {
-            return new ResponseEntity<String>("User already exists.", HttpStatus.CONFLICT);
+        } catch (UserServiceException usex) {
+            if(usex.getMessage() == "Duplicate add."){
+                return new ResponseEntity<>("User already exists.", HttpStatus.CONFLICT);
+            }
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<String>("User was successfully created.", HttpStatus.OK);
+        return new ResponseEntity<>("User was successfully created.", HttpStatus.OK);
     }
 
 
@@ -68,8 +71,8 @@ public class UserController {
      * Get a userProfile.
      *
      * @param token The token of the user.
-     * @return UserProfile data and HttpStatus.OK if successful
-     *          HttpStatus.UNAUTORIZED otherwise.
+     * @return UserProfile data and 200 OK if successful
+     *          401 UNAUTHORIZED otherwise.
      */
     @RequestMapping(value = "/profile", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,7 +92,7 @@ public class UserController {
      * Deletes a user.
      *
      * @param userId The userIdDTO of the user being deleted.
-     * @return
+     * @return 200 OK if successful and 404 NOT FOUND otherwise.
      */
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.DELETE)
     ResponseEntity deleteUser(@PathVariable int userId){
@@ -105,7 +108,8 @@ public class UserController {
      * THe controller method for a video being added to user favorites
      *
      * @param videoId The id of the video being added from this users favorites.
-     * @return
+     * @return A response of 200 OK if successful, 404 NOT FOUND if video not found,
+     *         409 CONFLICT if duplicate add . Else 401 UNAUTHORIZED if user is null.
      */
     @RequestMapping(value = "/favorite/{videoId}", method = RequestMethod.POST)
     ResponseEntity addVideoToFavorites(@RequestHeader(name = "Token", required = false) String token,
@@ -121,7 +125,7 @@ public class UserController {
                     return new ResponseEntity<>("Video not found.", HttpStatus.NOT_FOUND);
                 }
             }catch (UserServiceException usex){
-                return new ResponseEntity<>("Duplicate add.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Duplicate add.", HttpStatus.CONFLICT);
             }
         }
         return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
@@ -131,7 +135,8 @@ public class UserController {
      * The controller method for a video being removed from user favorites.
      *
      * @param videoId The id of the video being removed from this users favorites.
-     * @return
+     * @return A response of 200 OK if successful, 404 NOT FOUND if video not found,
+     *         400 BAD_REQUEST if deletion fails . Else 401 UNAUTHORIZED if user is null.
      */
     @RequestMapping(value = "/favorite/{videoId}", method = RequestMethod.DELETE)
     ResponseEntity deleteVideoFromFavorites(@RequestHeader(name = "Token", required = false) String token,
@@ -157,7 +162,8 @@ public class UserController {
      * The controller method for a user being added to close friends
      *
      * @param friendId The id of the friend being added from this users close friends.
-     * @return
+     * @return A response of 200 OK if successful, 404 NOT FOUND if friend not found,
+     *         409 CONFLICT if duplicate add . Else 401 UNAUTHORIZED if user is null.
      */
     @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.POST)
     ResponseEntity addCloseFriend(@RequestHeader(name = "Token", required = false) String token,
@@ -169,9 +175,9 @@ public class UserController {
                 return new ResponseEntity<>("Friend was successfully added.", HttpStatus.OK);
             }catch (UserServiceException usex){
                 if(usex.getMessage() == "Duplicate add."){
-                    return new ResponseEntity<>("Duplicate add.",HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Duplicate add.",HttpStatus.CONFLICT);
                 }
-                return new ResponseEntity<>("Friend not found", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Friend not found", HttpStatus.NOT_FOUND);
             }
        }
         return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
@@ -181,7 +187,8 @@ public class UserController {
      * The controller method for a user being removed from close friends.
      *
      * @param friendId The id of the friend being removed from this users close friends.
-     * @return
+     * @return A response of 200 OK if successful, 400 BAD REQUEST if Deletion fails.
+     *         Else 401 UNAUTHORIZED if user is null.
      */
     @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.DELETE)
     ResponseEntity deleteFromCloseFriends(@RequestHeader(name = "Token", required = false) String token,

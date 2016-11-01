@@ -24,6 +24,7 @@ public interface UserService {
      * Creates userProfile.
      *
      * @param userId The userId of the user.
+     * @throws UserServiceException If the user could not be added to the database.
      */
     void createUserProfile(int userId) throws UserServiceException;
 
@@ -39,6 +40,7 @@ public interface UserService {
      * Deletes user profile
      *
      * @param userId The userId of the user being deleted.
+     * @throws UserServiceException If the user could not be removed to the database.
      */
     void deleteUserProfile(int userId) throws UserServiceException;
 
@@ -47,6 +49,7 @@ public interface UserService {
      *
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being added.
+     * @throws UserServiceException If the user entry could not be added to the database.
      */
     void addVideoToFavorites(int userId, int videoId) throws UserServiceException;
 
@@ -55,6 +58,7 @@ public interface UserService {
      *
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being deleted.
+     * @throws UserServiceException If the user entry could not be removed to the database.
      */
     void deleteVideoFromFavorites(int userId, int videoId) throws UserServiceException;
 
@@ -63,6 +67,7 @@ public interface UserService {
      *
      * @param userId The userId of the user.
      * @param friendId The friendId of the user being added.
+     * @throws UserServiceException If the user entry could not be added to the database.
      */
     void addUserToCloseFriends(int userId, int friendId) throws UserServiceException;
 
@@ -71,6 +76,7 @@ public interface UserService {
      *
      * @param userId The userId of the user.
      * @param friendId The friendId og the user being deleted.
+     * @throws UserServiceException If the user entry could not be removed to the database.
      */
     void deleteUserFromCloseFriends(int userId, int friendId) throws UserServiceException;
 }

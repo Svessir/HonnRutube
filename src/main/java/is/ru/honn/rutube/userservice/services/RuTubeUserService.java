@@ -16,7 +16,7 @@ import is.ru.honn.rutube.userservice.domain.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * RuTube user service
+ * RuTube user service.
  *
  * @author Kári
  * @version 1.0, 27 okt. 2016
@@ -26,9 +26,10 @@ public class RuTubeUserService implements UserService {
 
 
     /**
-     * Creates a userProfile
+     * Creates a userProfile.
      *
      * @param userId The userId of the user.
+     * @throws UserServiceException If the user could not be added to the database.
      */
     @Override
     public void createUserProfile(int userId) throws UserServiceException {
@@ -54,6 +55,7 @@ public class RuTubeUserService implements UserService {
      * Deletes user profile.
      *
      * @param userId The userId of the user being deleted.
+     * @throws UserServiceException If the user could not be removed to the database.
      */
     @Override
     public void deleteUserProfile(int userId) throws UserServiceException {
@@ -70,6 +72,7 @@ public class RuTubeUserService implements UserService {
      *
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being added.
+     * @throws UserServiceException If the user entry could not be added to the database.
      */
     @Override
     public void addVideoToFavorites(int userId, int videoId) throws UserServiceException {
@@ -85,6 +88,7 @@ public class RuTubeUserService implements UserService {
      *
      * @param userId The userId of the user.
      * @param videoId The videoId of the video being deleted.
+     * @throws UserServiceException If the user entry could not be removed to the database.
      */
     @Override
     public void deleteVideoFromFavorites(int userId, int videoId) throws UserServiceException {
@@ -100,6 +104,7 @@ public class RuTubeUserService implements UserService {
      *
      * @param userId The userId of the user.
      * @param friendId The friendId of the user being added.
+     * @throws UserServiceException If the user entry could not be added to the database.
      */
     @Override
     public void addUserToCloseFriends(int userId, int friendId) throws UserServiceException {
@@ -125,6 +130,7 @@ public class RuTubeUserService implements UserService {
      *
      * @param userId The userId of the user.
      * @param friendId The friendId og the user being deleted.
+     * @throws UserServiceException If the user entry could not be removed to the database.
      */
     @Override
     public void deleteUserFromCloseFriends(int userId, int friendId) throws UserServiceException {
@@ -137,9 +143,9 @@ public class RuTubeUserService implements UserService {
     }
 
     /**
-     * Sets the user data gateway
+     * Sets the user data gateway.
      *
-     * @param userDataGateway The userDataGateway
+     * @param userDataGateway The userDataGateway.
      */
     public void setUserDataGateway(UserDataGateway userDataGateway) {
         this.userDataGateway = userDataGateway;
